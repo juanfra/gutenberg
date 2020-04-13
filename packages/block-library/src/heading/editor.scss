@@ -1,0 +1,12 @@
+// Heading level toolbar styles.
+// TODO: Make these styles more generic.
+
+// Remove padding in heading level control popover since the toolbar buttons already have padding.
+.block-editor-heading-level-toolbar .components-popover__content {
+	padding: 0;
+}
+
+// Remove border from heading lebel toolbar since the popover already has a border and having a nested border looks weird.
+.block-editor-heading-level-toolbar .components-toolbar {
+	border: none;
+}
