@@ -14,6 +14,7 @@ import {
 	RichText,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
+import { ToolbarGroup } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 
 /**
@@ -37,12 +38,14 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 	return (
 		<>
 			<BlockControls>
-				<HeadingLevelToolbar
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
+				<ToolbarGroup>
+					<HeadingLevelToolbar
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
+					/>
+				</ToolbarGroup>
 				{ ! isAndroid && (
 					<AlignmentToolbar
 						value={ align }

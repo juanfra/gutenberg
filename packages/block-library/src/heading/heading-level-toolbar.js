@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Toolbar, ToolbarGroup } from '@wordpress/components';
+import { Button, Dropdown, ToolbarGroup } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -36,13 +37,30 @@ const POPOVER_PROPS = {
  */
 export default function HeadingLevelToolbar( { selectedLevel, onChange } ) {
 	return (
-		<Toolbar
-			isCollapsed={ true }
-			icon={ <HeadingLevelIcon level={ selectedLevel } /> }
-			label={ __( 'Change heading level' ) }
+		<Dropdown
 			popoverProps={ POPOVER_PROPS }
-		>
-			{ () => (
+			renderToggle={ ( { onToggle, isOpen } ) => {
+				const openOnArrowDown = ( event ) => {
+					if ( ! isOpen && event.keyCode === DOWN ) {
+						event.preventDefault();
+						event.stopPropagation();
+						onToggle();
+					}
+				};
+
+				return (
+					<Button
+						onClick={ onToggle }
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+						label={ __( 'Change heading level' ) }
+						onKeyDown={ openOnArrowDown }
+						showTooltip
+						icon={ <HeadingLevelIcon level={ selectedLevel } /> }
+					/>
+				);
+			} }
+			renderContent={ () => (
 				<ToolbarGroup
 					isCollapsed={ false }
 					controls={ HEADING_LEVELS.map( ( targetLevel ) => {
@@ -64,6 +82,6 @@ export default function HeadingLevelToolbar( { selectedLevel, onChange } ) {
 					} ) }
 				/>
 			) }
-		</Toolbar>
+		></Dropdown>
 	);
 }
