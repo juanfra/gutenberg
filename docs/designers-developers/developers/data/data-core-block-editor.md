@@ -366,6 +366,21 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
+<a name="getInnerBlockController" href="#getInnerBlockController">#</a> **getInnerBlockController**
+
+Gets the clientId of block which controls the given block. Essentially, it
+iterates up the block tree, stopping if it finds a block which is marked as
+an InnerBlocks controller. The client ID of that controller is returned.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: The block to check.
+
+_Returns_
+
+-   `?string`: The client ID of the block that returns this one. Undefined if the given block is not a child of an InnerBlock controller.
+
 <a name="getInserterItems" href="#getInserterItems">#</a> **getInserterItems**
 
 Determines the items that appear in the inserter. Includes both static
@@ -847,13 +862,15 @@ _Returns_
 
 <a name="isLastBlockChangePersistent" href="#isLastBlockChangePersistent">#</a> **isLastBlockChangePersistent**
 
-Returns true if the most recent block change is be considered persistent, or
-false otherwise. A persistent change is one committed by BlockEditorProvider
-via its `onChange` callback, in addition to `onInput`.
+Returns true if the most recent block change is to be considered persistent
+with respect to the provided root client ID, or false otherwise. A persistent
+change is one committed by `BlockEditorProvider` via its `onChange` callback,
+in addition to `onInput`.
 
 _Parameters_
 
 -   _state_ `Object`: Block editor state.
+-   _rootClientId_ `[string]`: Block root client ID.
 
 _Returns_
 
@@ -1137,11 +1154,17 @@ _Returns_
 Returns an action object signalling that a blocks should be replaced with
 one or more replacement blocks.
 
+You may set `isLocalChange` to true to scope change detection to a section of
+the block tree. I.e. so the edit doesn't dirty the entire block tree. This
+is used for edits made to blocks that are saved somewhere other than the main
+post by their root.
+
 _Parameters_
 
 -   _clientIds_ `(string|Array<string>)`: Block client ID(s) to replace.
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
+-   _isLocalChange_ `[boolean]`: Whether to scope change detection.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 
@@ -1388,10 +1411,16 @@ _Returns_
 Returns an action object used in signalling that the block attributes with
 the specified client ID has been updated.
 
+You may specify a root client ID to scope change detection to a section of
+the block tree. I.e. so the edit doesn't dirty the entire block tree. This
+is used for edits made to blocks that are saved somewhere other than the main
+post by their root.
+
 _Parameters_
 
 -   _clientId_ `string`: Block client ID.
 -   _attributes_ `Object`: Block attributes to be merged.
+-   _rootClientId_ `[string]`: Block root client ID.
 
 _Returns_
 

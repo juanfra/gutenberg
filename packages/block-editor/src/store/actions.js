@@ -100,16 +100,23 @@ export function receiveBlocks( blocks ) {
  * Returns an action object used in signalling that the block attributes with
  * the specified client ID has been updated.
  *
+ * You may specify a root client ID to scope change detection to a section of
+ * the block tree. I.e. so the edit doesn't dirty the entire block tree. This
+ * is used for edits made to blocks that are saved somewhere other than the main
+ * post by their root.
+ *
  * @param {string} clientId   Block client ID.
  * @param {Object} attributes Block attributes to be merged.
+ * @param {string} [rootClientId] Block root client ID.
  *
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientId, attributes ) {
+export function updateBlockAttributes( clientId, attributes, rootClientId ) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientId,
 		attributes,
+		rootClientId,
 	};
 }
 
@@ -285,14 +292,24 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
+ * You may set `isLocalChange` to true to scope change detection to a section of
+ * the block tree. I.e. so the edit doesn't dirty the entire block tree. This
+ * is used for edits made to blocks that are saved somewhere other than the main
+ * post by their root.
+ *
  * @param {(string|string[])} clientIds     Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks        Replacement block(s).
- * @param {number}            indexToSelect Index of replacement block to
- *                                          select.
+ * @param {number}            indexToSelect Index of replacement block to select.
+ * @param {boolean}           [isLocalChange] Whether to scope change detection.
  *
  * @yield {Object} Action object.
  */
-export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
+export function* replaceBlocks(
+	clientIds,
+	blocks,
+	indexToSelect,
+	isLocalChange = false
+) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -322,6 +339,7 @@ export function* replaceBlocks( clientIds, blocks, indexToSelect ) {
 		blocks,
 		time: Date.now(),
 		indexToSelect,
+		rootClientId: isLocalChange ? rootClientId : undefined,
 	};
 	yield* ensureDefaultBlock();
 }
