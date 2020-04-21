@@ -54,6 +54,7 @@ function NavigationLinkEdit( {
 	rgbBackgroundColor,
 	saveEntityRecord,
 	userCanCreatePages = false,
+	onReplace,
 } ) {
 	const { label, opensInNewTab, url, nofollow, description } = attributes;
 	const link = {
@@ -218,6 +219,7 @@ function NavigationLinkEdit( {
 						onChange={ ( labelValue ) =>
 							setAttributes( { label: labelValue } )
 						}
+						onRemove={ () => onReplace( [] ) }
 						placeholder={ itemLabelPlaceholder }
 						keepPlaceholderOnFocus
 						withoutInteractiveFormatting
