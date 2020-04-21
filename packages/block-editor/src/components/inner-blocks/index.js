@@ -261,7 +261,9 @@ const ComposedInnerBlocks = compose( [
 				! hasSelectedInnerBlock( clientId, true ),
 			parentLock: getTemplateLock( rootClientId ),
 			enableClickThrough: isNavigationMode() || isSmallScreen,
-			isLastBlockChangePersistent: isLastBlockChangePersistent(),
+			isLastBlockChangePersistent: isLastBlockChangePersistent(
+				clientId
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

@@ -299,7 +299,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	return {
 		setAttributes( newAttributes ) {
 			const { clientId } = ownProps;
-			updateBlockAttributes( clientId, newAttributes );
+			const { getInnerBlockController } = select( 'core/block-editor' );
+			const rootClientId = getInnerBlockController( clientId );
+			updateBlockAttributes( clientId, newAttributes, rootClientId );
 		},
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
@@ -338,7 +340,15 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			) {
 				__unstableMarkLastChangeAsPersistent();
 			}
-			replaceBlocks( [ ownProps.clientId ], blocks, indexToSelect );
+			const { clientId } = ownProps;
+			const { getInnerBlockController } = select( 'core/block-editor' );
+			const rootClientId = getInnerBlockController( clientId );
+			replaceBlocks(
+				[ clientId ],
+				blocks,
+				indexToSelect,
+				!! rootClientId
+			);
 		},
 		toggleSelection( selectionEnabled ) {
 			toggleSelection( selectionEnabled );
