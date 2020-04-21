@@ -1674,3 +1674,25 @@ export function isBlockHighlighted( state, clientId ) {
 export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
+
+/**
+ * Gets the clientId of block which controls the given block. Essentially, it
+ * iterates up the block tree, stopping if it finds a block which is marked as
+ * an InnerBlocks controller. The client ID of that controller is returned.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} clientId The block to check.
+ *
+ * @return {?string} The client ID of the block that returns this one. Undefined
+ *                   if the given block is not a child of an InnerBlock controller.
+ */
+export function getInnerBlockController( state, clientId ) {
+	let rootClientId = clientId;
+	// Continue up the block true, stopping if we find an InnerBlock Controller.
+	while ( ( rootClientId = getBlockRootClientId( state, rootClientId ) ) ) {
+		if ( areInnerBlocksControlled( state, rootClientId ) ) {
+			return rootClientId;
+		}
+	}
+	return undefined;
+}
