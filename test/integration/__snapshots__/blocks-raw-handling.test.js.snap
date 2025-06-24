@@ -203,18 +203,18 @@ exports[`rawHandler should preserve alignment 1`] = `
 
 exports[`rawHandler should preserve all paragraphs 1`] = `
 "<!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>&nbsp;&nbsp;</p>
+<p class="wp-block-paragraph">&nbsp;&nbsp;</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"className":"p"} -->
-<p class="p"></p>
+<p class="wp-block-paragraph p"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->"
 `;
