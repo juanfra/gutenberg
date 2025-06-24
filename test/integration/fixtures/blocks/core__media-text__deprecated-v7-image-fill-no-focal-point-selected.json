@@ -20,7 +20,8 @@
 					"content": "My Content",
 					"dropCap": false,
 					"placeholder": "Content…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"className": "has-large-font-size"
 				},
 				"innerBlocks": []
 			}
