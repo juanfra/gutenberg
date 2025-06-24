@@ -2,6 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
+const DefinePlugin = require( 'webpack' ).DefinePlugin;
 
 /**
  * WordPress dependencies
@@ -30,9 +31,11 @@ const stories = [
 	process.env.NODE_ENV !== 'test' && './stories/**/*.story.@(js|tsx)',
 	process.env.NODE_ENV !== 'test' && './stories/**/*.mdx',
 	'../packages/block-editor/src/**/stories/*.story.@(js|tsx|mdx)',
-	'../packages/components/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/components/src/**/stories/*.story.@(js|tsx)',
+	'../packages/components/src/**/stories/*.mdx',
 	'../packages/icons/src/**/stories/*.story.@(js|tsx|mdx)',
 	'../packages/edit-site/src/**/stories/*.story.@(js|tsx|mdx)',
+	'../packages/dataviews/src/**/stories/*.story.@(js|tsx|mdx)',
 ].filter( Boolean );
 
 module.exports = {
@@ -40,6 +43,7 @@ module.exports = {
 		disableTelemetry: true,
 	},
 	stories,
+	staticDirs: [ './static' ],
 	addons: [
 		{
 			name: '@storybook/addon-docs',
@@ -50,19 +54,17 @@ module.exports = {
 		'@storybook/addon-a11y',
 		'@storybook/addon-toolbars',
 		'@storybook/addon-actions',
+		'@storybook/addon-webpack5-compiler-babel',
 		'storybook-source-link',
+		'@geometricpanda/storybook-addon-badges',
 	],
 	framework: {
 		name: '@storybook/react-webpack5',
 		options: {},
 	},
-	features: {
-		babelModeV7: true,
-		emotionAlias: false,
-		storyStoreV7: true,
-	},
-	docs: {
-		autodocs: true,
+	docs: {},
+	typescript: {
+		reactDocgen: 'react-docgen-typescript',
 	},
 	webpackFinal: async ( config ) => {
 		return {
@@ -72,12 +74,23 @@ module.exports = {
 				rules: [
 					...config.module.rules,
 					{
-						// Adds a `sourceLink` parameter to the story metadata, based on the file path
-						test: /\/stories\/.+\.(j|t)sx?$/,
-						loader: path.resolve(
-							__dirname,
-							'./webpack/source-link-loader.js'
-						),
+						test: /\/stories\/.+\.story\.(j|t)sx?$/,
+						use: [
+							{
+								// Adds a `sourceLink` parameter to the story metadata, based on the file path
+								loader: path.resolve(
+									__dirname,
+									'./webpack/source-link-loader.js'
+								),
+							},
+							{
+								// Reads `tags` from the story metadata and copies them to `badges`
+								loader: path.resolve(
+									__dirname,
+									'./webpack/copy-tags-to-badges.js'
+								),
+							},
+						],
 						enforce: 'post',
 					},
 					{
@@ -93,6 +106,15 @@ module.exports = {
 					},
 				],
 			},
+			plugins: [
+				...config.plugins,
+				new DefinePlugin( {
+					// Ensures that `@wordpress/warning` can properly detect dev mode.
+					'globalThis.SCRIPT_DEBUG': JSON.stringify(
+						process.env.NODE_ENV === 'development'
+					),
+				} ),
+			],
 		};
 	},
 };

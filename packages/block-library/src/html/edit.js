@@ -7,8 +7,16 @@ import {
 	BlockControls,
 	PlainText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToolbarButton, Disabled, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	Disabled,
+	ToolbarGroup,
+	VisuallyHidden,
+} from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,6 +27,12 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 	const [ isPreview, setIsPreview ] = useState();
 	const isDisabled = useContext( Disabled.Context );
 
+	const instanceId = useInstanceId( HTMLEdit, 'html-edit-desc' );
+
+	const isPreviewMode = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings().isPreviewMode;
+	}, [] );
+
 	function switchToPreview() {
 		setIsPreview( true );
 	}
@@ -27,19 +41,22 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 		setIsPreview( false );
 	}
 
+	const blockProps = useBlockProps( {
+		className: 'block-library-html__edit',
+		'aria-describedby': isPreview ? instanceId : undefined,
+	} );
+
 	return (
-		<div { ...useBlockProps( { className: 'block-library-html__edit' } ) }>
+		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						className="components-tab-button"
 						isPressed={ ! isPreview }
 						onClick={ switchToHTML }
 					>
 						HTML
 					</ToolbarButton>
 					<ToolbarButton
-						className="components-tab-button"
 						isPressed={ isPreview }
 						onClick={ switchToPreview }
 					>
@@ -47,11 +64,18 @@ export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			{ isPreview || isDisabled ? (
-				<Preview
-					content={ attributes.content }
-					isSelected={ isSelected }
-				/>
+			{ isPreview || isPreviewMode || isDisabled ? (
+				<>
+					<Preview
+						content={ attributes.content }
+						isSelected={ isSelected }
+					/>
+					<VisuallyHidden id={ instanceId }>
+						{ __(
+							'HTML preview is not yet fully accessible. Please switch screen reader to virtualized mode to navigate the below iFrame.'
+						) }
+					</VisuallyHidden>
+				</>
 			) : (
 				<PlainText
 					value={ attributes.content }

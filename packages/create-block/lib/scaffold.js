@@ -2,6 +2,7 @@
  * External dependencies
  */
 const { pascalCase, snakeCase } = require( 'change-case' );
+const { join } = require( 'path' );
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ module.exports = async (
 		description,
 		dashicon,
 		category,
+		textdomain,
 		attributes,
 		supports,
 		author,
@@ -34,25 +36,84 @@ module.exports = async (
 		domainPath,
 		updateURI,
 		version,
+		requiresAtLeast,
+		requiresPHP,
+		testedUpTo,
 		wpScripts,
 		wpEnv,
 		npmDependencies,
 		npmDevDependencies,
 		customScripts,
 		folderName,
+		targetDir,
 		editorScript,
 		editorStyle,
 		style,
+		viewStyle,
 		render,
+		viewScriptModule,
 		viewScript,
 		variantVars,
 		customPackageJSON,
 		customBlockJSON,
 		example,
+		transformer,
 	}
 ) => {
 	slug = slug.toLowerCase();
-	namespace = namespace.toLowerCase();
+	const rootDirectory = join( process.cwd(), targetDir || slug );
+	const transformedValues = transformer( {
+		$schema,
+		apiVersion,
+		plugin,
+		namespace: namespace.toLowerCase(),
+		slug,
+		title,
+		description,
+		dashicon,
+		category,
+		attributes,
+		supports,
+		author,
+		pluginURI,
+		license,
+		licenseURI,
+		domainPath,
+		updateURI,
+		version,
+		requiresAtLeast,
+		requiresPHP,
+		testedUpTo,
+		wpScripts,
+		wpEnv,
+		npmDependencies,
+		npmDevDependencies,
+		customScripts,
+		folderName: folderName.replace( /\$slug/g, slug ),
+		editorScript,
+		editorStyle,
+		style,
+		viewStyle,
+		render,
+		viewScriptModule,
+		viewScript,
+		variantVars,
+		customPackageJSON,
+		customBlockJSON,
+		example,
+		textdomain: textdomain || slug,
+		rootDirectory,
+	} );
+
+	const view = {
+		...transformedValues,
+		namespaceSnakeCase: snakeCase( transformedValues.namespace ),
+		namespacePascalCase: pascalCase( transformedValues.namespace ),
+		slugSnakeCase: snakeCase( transformedValues.slug ),
+		slugPascalCase: pascalCase( transformedValues.slug ),
+		...variantVars,
+	};
+
 	/**
 	 * --no-plugin relies on the used template supporting the [blockTemplatesPath property](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-create-block/#blocktemplatespath).
 	 * If the blockOutputTemplates object has no properties, we can assume that there was a custom --template passed that
@@ -65,52 +126,11 @@ module.exports = async (
 		return;
 	}
 
+	const projectType = plugin ? 'plugin' : 'block';
 	info( '' );
 	info(
-		plugin
-			? `Creating a new WordPress plugin in the ${ slug } directory.`
-			: `Creating a new block in the ${ slug } directory.`
+		`Creating a new WordPress ${ projectType } in the ${ rootDirectory } directory.`
 	);
-
-	const view = {
-		$schema,
-		apiVersion,
-		plugin,
-		namespace,
-		namespaceSnakeCase: snakeCase( namespace ),
-		slug,
-		slugSnakeCase: snakeCase( slug ),
-		slugPascalCase: pascalCase( slug ),
-		title,
-		description,
-		dashicon,
-		category,
-		attributes,
-		supports,
-		version,
-		author,
-		pluginURI,
-		license,
-		licenseURI,
-		textdomain: slug,
-		domainPath,
-		updateURI,
-		wpScripts,
-		wpEnv,
-		npmDependencies,
-		npmDevDependencies,
-		customScripts,
-		folderName,
-		editorScript,
-		editorStyle,
-		style,
-		render,
-		viewScript,
-		customPackageJSON,
-		customBlockJSON,
-		example,
-		...variantVars,
-	};
 
 	if ( plugin ) {
 		await Promise.all(
@@ -152,9 +172,7 @@ module.exports = async (
 	info( '' );
 
 	success(
-		plugin
-			? `Done: WordPress plugin ${ title } bootstrapped in the ${ slug } directory.`
-			: `Done: Block "${ title }" bootstrapped in the ${ slug } directory.`
+		`Done: WordPress ${ projectType } ${ title } bootstrapped in the ${ rootDirectory } directory.`
 	);
 
 	if ( plugin && wpScripts ) {

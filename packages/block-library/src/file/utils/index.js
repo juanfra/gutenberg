@@ -10,7 +10,7 @@ export const browserSupportsPdfs = () => {
 		return false;
 	}
 
-	// Android tablets are the noteable exception.
+	// Android tablets are the notable exception.
 	if ( window.navigator.userAgent.indexOf( 'Android' ) > -1 ) {
 		return false;
 	}
@@ -53,19 +53,4 @@ const createActiveXObject = ( type ) => {
 		ax = undefined;
 	}
 	return ax;
-};
-
-/**
- * Hides all .wp-block-file__embed elements on the document. This function is only intended
- * to be run on the front-end, it may have weird side effects running in the block editor.
- */
-export const hidePdfEmbedsOnUnsupportedBrowsers = () => {
-	if ( ! browserSupportsPdfs() ) {
-		const embeds = document.getElementsByClassName(
-			'wp-block-file__embed'
-		);
-		Array.from( embeds ).forEach( ( embed ) => {
-			embed.style.display = 'none';
-		} );
-	}
 };

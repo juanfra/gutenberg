@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Pressable } from 'react-native';
+import { Image } from 'react-native';
 import {
 	getEditorHtml,
 	initializeEditor,
@@ -11,8 +11,9 @@ import {
 	within,
 	getBlock,
 	openBlockSettings,
+	setupMediaPicker,
+	setupPicker,
 } from 'test/helpers';
-import HsvColorPicker from 'react-native-hsv-color-picker';
 
 /**
  * WordPress dependencies
@@ -52,14 +53,14 @@ const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish
 <p class="wp-block-paragraph has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
-const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
-<p class="wp-block-paragraph has-text-align-center has-large-font-size"></p>
+const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"isDark":false} -->
+<div class="wp-block-cover is-light"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class=""wp-block-paragraph has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
-const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","minHeight":20,"minHeightUnit":"vw","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
-<p class="wp-block-paragraph has-text-align-center has-large-font-size"></p>
+const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":20,"minHeightUnit":"vw","isDark":false} -->
+<div class="wp-block-cover is-light" style="min-height:20vw"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<p class=""wp-block-paragraph has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 
@@ -69,10 +70,23 @@ const COLOR_GRAY = '#abb8c3';
 const GRADIENT_GREEN =
 	'linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%)';
 
+const MEDIA_OPTIONS = [
+	'Choose from device',
+	'Take a Photo',
+	'Take a Video',
+	'WordPress Media Library',
+];
+
 // Simplified tree to render Cover edit within slot.
 const CoverEdit = ( props ) => (
 	<SlotFillProvider>
-		<BlockEdit isSelected name={ cover.name } clientId={ 0 } { ...props } />
+		<BlockEdit
+			isSelected
+			mayDisplayControls
+			name={ cover.name }
+			clientId={ 0 }
+			{ ...props }
+		/>
 		<BottomSheetSettings isVisible />
 	</SlotFillProvider>
 );
@@ -87,7 +101,7 @@ const attributes = {
 };
 
 beforeAll( () => {
-	// Mock Image.getSize to avoid failed attempt to size non-existant image.
+	// Mock Image.getSize to avoid failed attempt to size non-existent image.
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
@@ -125,6 +139,35 @@ describe( 'when no media is attached', () => {
 		fireEvent.press( mediaLibraryButton );
 
 		expect( requestMediaPicker ).toHaveBeenCalled();
+	} );
+} );
+
+describe( 'when no media is attached and overlay color is set', () => {
+	it( 'adds image', async () => {
+		const media = {
+			type: 'image',
+			id: 2000,
+			url: 'https://test.files.wordpress.com/local-image-1.mp4',
+		};
+		const { mediaPickerCallback } = setupMediaPicker();
+		const screen = await initializeEditor( {
+			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
+		} );
+		const { getByText } = screen;
+		const { selectOption } = setupPicker( screen, MEDIA_OPTIONS );
+
+		// Get block
+		const coverBlock = await getBlock( screen, 'Cover' );
+		fireEvent.press( coverBlock );
+
+		// Open block settings
+		await openBlockSettings( screen );
+
+		fireEvent.press( getByText( 'Add image or video' ) );
+		selectOption( 'WordPress Media Library' );
+		await mediaPickerCallback( media );
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );
 
@@ -170,9 +213,8 @@ describe( 'when an image is attached', () => {
 			/>
 		);
 		fireEvent.press( screen.getByLabelText( 'Edit image' ) );
-		const [ clearMediaButton ] = await screen.findAllByText(
-			'Clear Media'
-		);
+		const [ clearMediaButton ] =
+			await screen.findAllByText( 'Clear Media' );
 		fireEvent.press( clearMediaButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -192,9 +234,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const fixedBackgroundButton = await screen.findByText(
-			'Fixed background'
-		);
+		const fixedBackgroundButton =
+			await screen.findByText( 'Fixed background' );
 		fireEvent.press( fixedBackgroundButton );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
@@ -211,9 +252,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent(
 			screen.getByTestId( 'Slider Y-Axis Position', { hidden: true } ),
@@ -240,9 +280,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -269,9 +308,8 @@ describe( 'when an image is attached', () => {
 				setAttributes={ setAttributes }
 			/>
 		);
-		const editFocalPointButton = await screen.findByText(
-			'Edit focal point'
-		);
+		const editFocalPointButton =
+			await screen.findByText( 'Edit focal point' );
 		fireEvent.press( editFocalPointButton );
 		fireEvent.press(
 			screen.getByText( ( attributes.focalPoint.x * 100 ).toString(), {
@@ -361,9 +399,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -400,9 +437,8 @@ describe( 'color settings', () => {
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -456,9 +492,8 @@ describe( 'color settings', () => {
 		fireEvent.press( colorButton );
 
 		// Wait for the block to be created.
-		const [ coverBlockWithOverlay ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlockWithOverlay ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlockWithOverlay );
 
 		// Open Block Settings.
@@ -506,15 +541,14 @@ describe( 'color settings', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
+	it( 'clears the selected overlay color and maintains the inner blocks', async () => {
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );
 
 		// Wait for the block to be created.
-		const [ coverBlock ] = await screen.findAllByLabelText(
-			/Cover Block\. Row 1/
-		);
+		const [ coverBlock ] =
+			await screen.findAllByLabelText( /Cover Block\. Row 1/ );
 		fireEvent.press( coverBlock );
 
 		// Open Block Settings.
@@ -541,9 +575,6 @@ describe( 'color settings', () => {
 	} );
 
 	it( 'displays the hex color value in the custom color picker', async () => {
-		HsvColorPicker.mockImplementation( ( props ) => {
-			return <Pressable { ...props } testID="hsv-color-picker" />;
-		} );
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_PLACEHOLDER_HTML,
 		} );

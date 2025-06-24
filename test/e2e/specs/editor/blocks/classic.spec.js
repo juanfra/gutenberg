@@ -18,15 +18,10 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.beforeEach( async ( { admin, page } ) => {
+	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -64,19 +59,19 @@ test.describe( 'Classic', () => {
 		await expect( modalGalleryTab ).toBeVisible();
 		await modalGalleryTab.click();
 
-		const filename = await mediaUtils.upload(
+		const fileName = await mediaUtils.upload(
 			page.locator( '.media-modal .moxie-shim input[type=file]' )
 		);
 
 		// Wait for upload
 		await expect(
-			page.locator( `role=checkbox[name="${ filename }"i]` )
+			page.locator( `role=checkbox[name="${ fileName }"i]` )
 		).toBeChecked();
 
 		const createGallery = page.getByRole( 'button', {
 			name: 'Create a new gallery',
 		} );
-		await expect( createGallery ).not.toBeDisabled();
+		await expect( createGallery ).toBeEnabled();
 		await createGallery.click();
 		await page.click( 'role=button[name="Insert gallery"i]' );
 
@@ -111,7 +106,7 @@ test.describe( 'Classic', () => {
 		page,
 		pageUtils,
 	} ) => {
-		// Based on docs routing diables caching.
+		// Based on docs routing disables caching.
 		// See: https://playwright.dev/docs/api/class-page#page-route
 		await page.route( '**', async ( route ) => {
 			await route.continue();
@@ -124,22 +119,12 @@ test.describe( 'Classic', () => {
 		// Move focus away.
 		await pageUtils.pressKeys( 'shift+Tab' );
 
-		await page.click( 'role=button[name="Save draft"i]' );
-
-		await expect(
-			page.locator( 'role=button[name="Saved"i]' )
-		).toBeDisabled();
-
+		await editor.saveDraft();
 		await page.reload();
 		await page.unroute( '**' );
 
 		// To do: run with iframe.
-		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: '2',
-				title: 'test',
-			} );
-		} );
+		await editor.switchToLegacyCanvas();
 
 		const errors = [];
 		page.on( 'pageerror', ( exception ) => {
@@ -176,12 +161,12 @@ class MediaUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
 		await inputElement.setInputFiles( tmpFileName );
 
-		return filename;
+		return fileName;
 	}
 }

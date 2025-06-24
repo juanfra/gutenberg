@@ -1,14 +1,42 @@
 /**
  * External dependencies
  */
-import { render, screen, fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
  */
-import FontSizePicker from '../';
+import _FontSizePicker from '../';
 import type { FontSize } from '../types';
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+const FontSizePicker = (
+	props: React.ComponentProps< typeof _FontSizePicker >
+) => <_FontSizePicker __next40pxDefaultSize { ...props } />;
+
+const ControlledFontSizePicker = ( {
+	onChange,
+	...props
+}: React.ComponentProps< typeof FontSizePicker > ) => {
+	const [ fontSize, setFontSize ] =
+		useState< typeof props.value >( undefined );
+
+	return (
+		<FontSizePicker
+			{ ...props }
+			value={ fontSize }
+			onChange={ ( newFontSize ) => {
+				setFontSize( newFontSize );
+				onChange?.( newFontSize );
+			} }
+		/>
+	);
+};
 
 describe( 'FontSizePicker', () => {
 	test.each( [
@@ -21,14 +49,12 @@ describe( 'FontSizePicker', () => {
 		async ( { value, expectedValue } ) => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					value={ value }
-					onChange={ onChange }
-				/>
+			await render(
+				<FontSizePicker value={ value } onChange={ onChange } />
 			);
-			const input = screen.getByLabelText( 'Custom' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
 			await user.clear( input );
 			await user.type( input, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 3 ); // Once for the clear, then once per keystroke.
@@ -46,9 +72,8 @@ describe( 'FontSizePicker', () => {
 		async ( { firstFontSize, expectedValue } ) => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-			render(
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ [ { slug: 'slug', size: firstFontSize } ] }
 					onChange={ onChange }
 				/>
@@ -56,7 +81,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			const input = screen.getByLabelText( 'Custom' );
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Font size',
+			} );
 			await user.type( input, '80' );
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( expectedValue );
@@ -99,46 +126,20 @@ describe( 'FontSizePicker', () => {
 
 		it( 'displays a select control', async () => {
 			const user = userEvent.setup();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-				/>
-			);
+			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
+				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 8 );
+			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
-			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8' );
-			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12' );
-			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16' );
-			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20' );
-			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30' );
-			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40' );
-			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
+			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
+			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 12px' );
+			expect( options[ 3 ] ).toHaveAccessibleName( 'Medium 16px' );
+			expect( options[ 4 ] ).toHaveAccessibleName( 'Large 20px' );
+			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
+			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
 		} );
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size (px)' },
-			{ value: '8px', expectedLabel: 'Size (px)' },
-			{ value: '3px', expectedLabel: 'Size Custom' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			( { value, expectedLabel } ) => {
-				render(
-					<FontSizePicker
-						__nextHasNoMarginBottom
-						fontSizes={ fontSizes }
-						value={ value }
-					/>
-				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
-			}
-		);
 
 		test.each( [
 			{
@@ -147,7 +148,7 @@ describe( 'FontSizePicker', () => {
 				expectedArguments: [ undefined ],
 			},
 			{
-				option: 'Tiny 8',
+				option: 'Tiny 8px',
 				value: undefined,
 				expectedArguments: [ '8px', fontSizes[ 0 ] ],
 			},
@@ -156,16 +157,15 @@ describe( 'FontSizePicker', () => {
 			async ( { option, value, expectedArguments } ) => {
 				const user = userEvent.setup();
 				const onChange = jest.fn();
-				render(
+				await render(
 					<FontSizePicker
-						__nextHasNoMarginBottom
 						fontSizes={ fontSizes }
 						value={ value }
 						onChange={ onChange }
 					/>
 				);
 				await user.click(
-					screen.getByRole( 'button', { name: 'Font size' } )
+					screen.getByRole( 'combobox', { name: 'Font size' } )
 				);
 				await user.click(
 					screen.getByRole( 'option', { name: option } )
@@ -175,7 +175,6 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -215,17 +214,12 @@ describe( 'FontSizePicker', () => {
 
 		it( 'displays a select control', async () => {
 			const user = userEvent.setup();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-				/>
-			);
+			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
+				screen.getByRole( 'combobox', { name: 'Font size' } )
 			);
 			const options = screen.getAllByRole( 'option' );
-			expect( options ).toHaveLength( 8 );
+			expect( options ).toHaveLength( 7 );
 			expect( options[ 0 ] ).toHaveAccessibleName( 'Default' );
 			expect( options[ 1 ] ).toHaveAccessibleName( 'Tiny 8px' );
 			expect( options[ 2 ] ).toHaveAccessibleName( 'Small 1em' );
@@ -233,7 +227,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Large' );
 			expect( options[ 5 ] ).toHaveAccessibleName( 'Extra Large 30px' );
 			expect( options[ 6 ] ).toHaveAccessibleName( 'xx-large 40px' );
-			expect( options[ 7 ] ).toHaveAccessibleName( 'Custom' );
 		} );
 
 		test.each( [
@@ -242,40 +235,13 @@ describe( 'FontSizePicker', () => {
 			{ value: '8px', option: 'Tiny' },
 		] )(
 			'defaults to $option when value is $value',
-			( { value, option } ) => {
-				render(
-					<FontSizePicker
-						__nextHasNoMarginBottom
-						fontSizes={ fontSizes }
-						value={ value }
-					/>
+			async ( { value, option } ) => {
+				await render(
+					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
 				expect(
-					screen.getByRole( 'button', { name: 'Font size' } )
+					screen.getByRole( 'combobox', { name: 'Font size' } )
 				).toHaveTextContent( option );
-			}
-		);
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '8px', expectedLabel: 'Size' },
-			{ value: '1em', expectedLabel: 'Size' },
-			{ value: '2rem', expectedLabel: 'Size' },
-			{ value: 'clamp(1.75rem, 3vw, 2.25rem)', expectedLabel: 'Size' },
-			{ value: '3px', expectedLabel: 'Size Custom' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			( { value, expectedLabel } ) => {
-				render(
-					<FontSizePicker
-						__nextHasNoMarginBottom
-						fontSizes={ fontSizes }
-						value={ value }
-					/>
-				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
 			}
 		);
 
@@ -313,16 +279,15 @@ describe( 'FontSizePicker', () => {
 			async ( { option, value, expectedArguments } ) => {
 				const user = userEvent.setup();
 				const onChange = jest.fn();
-				render(
+				await render(
 					<FontSizePicker
-						__nextHasNoMarginBottom
 						fontSizes={ fontSizes }
 						value={ value }
 						onChange={ onChange }
 					/>
 				);
 				await user.click(
-					screen.getByRole( 'button', { name: 'Font size' } )
+					screen.getByRole( 'combobox', { name: 'Font size' } )
 				);
 				await user.click(
 					screen.getByRole( 'option', { name: option } )
@@ -332,7 +297,6 @@ describe( 'FontSizePicker', () => {
 			}
 		);
 
-		commonSelectTests( fontSizes );
 		commonTests( fontSizes );
 	} );
 
@@ -365,13 +329,8 @@ describe( 'FontSizePicker', () => {
 			},
 		];
 
-		it( 'displays a toggle group control with t-shirt sizes', () => {
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-				/>
-			);
+		it( 'displays a toggle group control with t-shirt sizes', async () => {
+			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			const options = screen.getAllByRole( 'radio' );
 			expect( options ).toHaveLength( 5 );
 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
@@ -386,35 +345,11 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 4 ] ).toHaveAccessibleName( 'Gigantosaurus' );
 		} );
 
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '12px', expectedLabel: 'Size Small' },
-			{ value: '40px', expectedLabel: 'Size Gigantosaurus' },
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			( { value, expectedLabel } ) => {
-				render(
-					<FontSizePicker
-						__nextHasNoMarginBottom
-						fontSizes={ fontSizes }
-						value={ value }
-					/>
-				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
-			}
-		);
-
 		it( 'calls onChange when a font size is selected', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-					onChange={ onChange }
-				/>
+			await render(
+				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
 			);
 			await user.click( screen.getByRole( 'radio', { name: 'Medium' } ) );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -449,13 +384,8 @@ describe( 'FontSizePicker', () => {
 			},
 		];
 
-		it( 'displays a toggle group control with t-shirt sizes', () => {
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-				/>
-			);
+		it( 'displays a toggle group control with t-shirt sizes', async () => {
+			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			const options = screen.getAllByRole( 'radio' );
 			expect( options ).toHaveLength( 4 );
 			expect( options[ 0 ] ).toHaveTextContent( 'S' );
@@ -467,31 +397,6 @@ describe( 'FontSizePicker', () => {
 			expect( options[ 3 ] ).toHaveTextContent( 'XL' );
 			expect( options[ 3 ] ).toHaveAccessibleName( 'Extra Large' );
 		} );
-
-		test.each( [
-			{ value: undefined, expectedLabel: 'Size' },
-			{ value: '12px', expectedLabel: 'Size Small' },
-			{ value: '1em', expectedLabel: 'Size Medium' },
-			{ value: '2rem', expectedLabel: 'Size Large' },
-			{
-				value: 'clamp(1.75rem, 3vw, 2.25rem)',
-				expectedLabel: 'Size Extra Large',
-			},
-		] )(
-			'displays $expectedLabel as label when value is $value',
-			( { value, expectedLabel } ) => {
-				render(
-					<FontSizePicker
-						__nextHasNoMarginBottom
-						fontSizes={ fontSizes }
-						value={ value }
-					/>
-				);
-				expect(
-					screen.getByLabelText( expectedLabel )
-				).toBeInTheDocument();
-			}
-		);
 
 		test.each( [
 			{ radio: 'Small', expectedArguments: [ '12px', fontSizes[ 0 ] ] },
@@ -509,9 +414,8 @@ describe( 'FontSizePicker', () => {
 			async ( { radio, expectedArguments } ) => {
 				const user = userEvent.setup();
 				const onChange = jest.fn();
-				render(
+				await render(
 					<FontSizePicker
-						__nextHasNoMarginBottom
 						fontSizes={ fontSizes }
 						onChange={ onChange }
 					/>
@@ -529,10 +433,9 @@ describe( 'FontSizePicker', () => {
 	} );
 
 	function commonToggleGroupTests( fontSizes: FontSize[] ) {
-		it( 'defaults to M when value is 16px', () => {
-			render(
+		it( 'defaults to M when value is 16px', async () => {
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
 				/>
@@ -544,15 +447,11 @@ describe( 'FontSizePicker', () => {
 
 		test.each( [ undefined, '' ] )(
 			'has no selection when value is %p',
-			( value ) => {
-				render(
-					<FontSizePicker
-						__nextHasNoMarginBottom
-						fontSizes={ fontSizes }
-						value={ value }
-					/>
+			async ( value ) => {
+				await render(
+					<FontSizePicker fontSizes={ fontSizes } value={ value } />
 				);
-				expect( screen.getByRole( 'radiogroup' ) ).toBeInTheDocument();
+				expect( screen.getByRole( 'radiogroup' ) ).toBeVisible();
 				expect(
 					screen.queryByRole( 'radio', { checked: true } )
 				).not.toBeInTheDocument();
@@ -560,62 +459,100 @@ describe( 'FontSizePicker', () => {
 		);
 	}
 
-	function commonSelectTests( fontSizes: FontSize[] ) {
-		it( 'shows custom input when Custom is selected', async () => {
-			const user = userEvent.setup();
-			const onChange = jest.fn();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-					onChange={ onChange }
-				/>
-			);
-			await user.click(
-				screen.getByRole( 'button', { name: 'Font size' } )
-			);
-			await user.click(
-				screen.getByRole( 'option', { name: 'Custom' } )
-			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
-			expect( onChange ).not.toHaveBeenCalled();
-		} );
-	}
-
 	function commonTests( fontSizes: FontSize[] ) {
-		it( 'shows custom input when value is unknown', () => {
-			render(
+		it( 'shows custom input when value is unknown', async () => {
+			await render(
+				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+			);
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
+		} );
+
+		it( 'hides custom input when disableCustomFontSizes is set to `true` with a custom font size', async () => {
+			const { rerender } = await render(
+				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+			);
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
+
+			rerender(
 				<FontSizePicker
-					__nextHasNoMarginBottom
+					disableCustomFontSizes
 					fontSizes={ fontSizes }
 					value="3px"
 				/>
 			);
-			expect( screen.getByLabelText( 'Custom' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByLabelText( 'Custom' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( "doesn't hide custom input when the selected font size is a predef", async () => {
+			const { rerender } = await render(
+				<FontSizePicker fontSizes={ fontSizes } value="3px" />
+			);
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
+
+			rerender(
+				<FontSizePicker
+					fontSizes={ fontSizes }
+					value={ fontSizes[ 0 ].size }
+				/>
+			);
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } )
+			).toBeVisible();
 		} );
 
 		it( 'allows custom values by default', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-					onChange={ onChange }
-				/>
+			await render(
+				<FontSizePicker fontSizes={ fontSizes } onChange={ onChange } />
 			);
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			await user.type( screen.getByLabelText( 'Custom' ), '80' );
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } ),
+				'80'
+			);
 			expect( onChange ).toHaveBeenCalledTimes( 2 ); // Once per keystroke.
 			expect( onChange ).toHaveBeenCalledWith( '80px' );
 		} );
 
-		it( 'does not allow custom values when disableCustomFontSizes is set', () => {
-			render(
+		it( 'allows switching between custom and predef inputs when pressing the dedicated toggle', async () => {
+			const user = userEvent.setup();
+
+			await render(
+				<ControlledFontSizePicker fontSizes={ fontSizes } />
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Set custom size' } )
+			);
+
+			await user.type(
+				screen.getByRole( 'spinbutton', { name: 'Font size' } ),
+				'80'
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Use size preset' } )
+			);
+
+			expect(
+				screen.queryByLabelText( 'Custom' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'does not allow custom values when disableCustomFontSizes is set', async () => {
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
 					disableCustomFontSizes
 				/>
@@ -627,12 +564,7 @@ describe( 'FontSizePicker', () => {
 
 		it( 'does not display a slider by default', async () => {
 			const user = userEvent.setup();
-			render(
-				<FontSizePicker
-					__nextHasNoMarginBottom
-					fontSizes={ fontSizes }
-				/>
-			);
+			await render( <FontSizePicker fontSizes={ fontSizes } /> );
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
@@ -644,9 +576,8 @@ describe( 'FontSizePicker', () => {
 		it( 'allows a slider to be used when withSlider is set', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-			render(
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
 					withSlider
 					onChange={ onChange }
@@ -655,7 +586,9 @@ describe( 'FontSizePicker', () => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Set custom size' } )
 			);
-			const sliderInput = screen.getByLabelText( 'Custom Size' );
+			const sliderInput = screen.getByRole( 'slider', {
+				name: 'Font size',
+			} );
 			fireEvent.change( sliderInput, {
 				target: { value: 80 },
 			} );
@@ -666,9 +599,8 @@ describe( 'FontSizePicker', () => {
 		it( 'allows reset by default', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
-			render(
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
 					onChange={ onChange }
@@ -684,9 +616,8 @@ describe( 'FontSizePicker', () => {
 
 		it( 'does not allow reset when withReset is false', async () => {
 			const user = userEvent.setup();
-			render(
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
 					withReset={ false }
@@ -703,9 +634,8 @@ describe( 'FontSizePicker', () => {
 		it( 'applies custom units to custom font size control', async () => {
 			const user = userEvent.setup();
 
-			render(
+			await render(
 				<FontSizePicker
-					__nextHasNoMarginBottom
 					fontSizes={ fontSizes }
 					value={ fontSizes[ 0 ].size }
 					units={ [ 'px', 'ch', 'ex' ] }

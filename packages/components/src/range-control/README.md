@@ -2,15 +2,7 @@
 
 RangeControls are used to make selections from a range of incremental values.
 
-![](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
-
-A RangeControl for volume
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
+![A RangeControl for volume](https://make.wordpress.org/design/files/2018/12/rangecontrol.png)
 
 ## Design guidelines
 
@@ -90,14 +82,16 @@ RangeControls should provide the full range of choices available for the user to
 Render a RangeControl to make a selection from a range of incremental values.
 
 ```jsx
+import { useState } from 'react';
 import { RangeControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyRangeControl = () => {
 	const [ columns, setColumns ] = useState( 2 );
 
-	return(
+	return (
 		<RangeControl
+			__nextHasNoMarginBottom
+			__next40pxDefaultSize
 			label="Columns"
 			value={ columns }
 			onChange={ ( value ) => setColumns( value ) }
@@ -113,7 +107,7 @@ const MyRangeControl = () => {
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input elements.
 
-### `afterIcon`: `string|Function|WPComponent|null`
+### `afterIcon`: `string|Function|Component|null`
 
 If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered after the slider with the icon equal to `afterIcon`.
 
@@ -130,7 +124,7 @@ If this property is true, a button to reset the slider is rendered.
 -   Default: `false`
 -   Platform: Web | Mobile
 
-### `beforeIcon`: `string|Function|WPComponent|null`
+### `beforeIcon`: `string|Function|Component|null`
 
 If this property is added, an [Icon component](/packages/components/src/icon/README.md) will be rendered before the slider with the icon equal to `beforeIcon`.
 
@@ -160,8 +154,7 @@ Disables the `input`, preventing new values from being applied.
 -   Required: No
 -   Platform: Web
 
-
-### `help`: `string|WPElement`
+### `help`: `string|Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
@@ -172,7 +165,7 @@ If this property is added, a help text will be generated using help property as 
 
 Provides control over whether the label will only be visible to screen readers.
 
-- Required: No
+-   Required: No
 
 ### `icon`: `string`
 
@@ -341,6 +334,7 @@ The minimum amount by which `value` changes. It is also a factor in validation a
 
 -   Required: No
 -   Platform: Web
+
 ### `trackColor`: `CSSProperties[ 'color' ]`
 
 CSS color string to customize the track element's background.
@@ -368,6 +362,20 @@ Determines if the `input` number field will render next to the RangeControl. Thi
 
 -   Required: No
 -   Platform: Web
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`
+
+### `__nextHasNoMarginBottom`: `boolean`
+
+Start opting into the new margin-free styles that will become the default in a future version.
+
+-   Required: No
+-   Default: `false`
 
 ## Related components
 

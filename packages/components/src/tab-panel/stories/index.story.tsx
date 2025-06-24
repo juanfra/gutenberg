@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from '@storybook/test';
 
 /**
  * WordPress dependencies
@@ -12,16 +13,18 @@ import { link, more, wordpress } from '@wordpress/icons';
  * Internal dependencies
  */
 import TabPanel from '..';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof TabPanel > = {
-	title: 'Components/TabPanel',
+	title: 'Components/Containers/TabPanel',
+	id: 'components-tabpanel',
 	component: TabPanel,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+	},
+	args: {
+		onSelect: fn(),
 	},
 };
 export default meta;
@@ -66,13 +69,7 @@ DisabledTab.args = {
 };
 
 const SlotFillTemplate: StoryFn< typeof TabPanel > = ( props ) => {
-	return (
-		<SlotFillProvider>
-			<TabPanel { ...props } />
-			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-			<Popover.Slot />
-		</SlotFillProvider>
-	);
+	return <TabPanel { ...props } />;
 };
 
 export const WithTabIconsAndTooltips = SlotFillTemplate.bind( {} );

@@ -13,16 +13,14 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../../button';
-import Popover from '../../popover';
 import { BorderBoxControl } from '../';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Components (Experimental)/BorderBoxControl',
+	title: 'Components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -53,7 +51,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	};
 
 	return (
-		<SlotFillProvider>
+		<>
 			<BorderBoxControl
 				{ ...otherProps }
 				onChange={ onChangeMerged }
@@ -78,13 +76,13 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 			>
 				Reset
 			</Button>
-			{ /* @ts-expect-error Ignore until Popover.Slot is converted to TS */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		</>
 	);
 };
 export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Borders',
+	enableStyle: true,
+	__next40pxDefaultSize: true,
 };

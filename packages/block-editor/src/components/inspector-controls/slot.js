@@ -16,6 +16,7 @@ export default function InspectorControlsSlot( {
 	__experimentalGroup,
 	group = 'default',
 	label,
+	fillProps,
 	...props
 } ) {
 	if ( __experimentalGroup ) {
@@ -29,9 +30,10 @@ export default function InspectorControlsSlot( {
 		);
 		group = __experimentalGroup;
 	}
-	const Slot = groups[ group ]?.Slot;
-	const fills = useSlotFills( Slot?.__unstableName );
-	if ( ! Slot ) {
+	const slotFill = groups[ group ];
+	const fills = useSlotFills( slotFill?.name );
+
+	if ( ! slotFill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
@@ -40,13 +42,19 @@ export default function InspectorControlsSlot( {
 		return null;
 	}
 
+	const { Slot } = slotFill;
+
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
-				<BlockSupportSlotContainer { ...props } Slot={ Slot } />
+				<BlockSupportSlotContainer
+					{ ...props }
+					fillProps={ fillProps }
+					Slot={ Slot }
+				/>
 			</BlockSupportToolsPanel>
 		);
 	}
 
-	return <Slot { ...props } bubblesVirtually />;
+	return <Slot { ...props } fillProps={ fillProps } bubblesVirtually />;
 }

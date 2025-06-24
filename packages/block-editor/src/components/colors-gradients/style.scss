@@ -15,12 +15,6 @@ $swatch-gap: 12px;
 	min-width: 0;
 }
 
-.block-editor-color-gradient-control__tabs {
-	.block-editor-color-gradient-control__panel {
-		padding: $grid-unit-20;
-	}
-}
-
 .block-editor-panel-color-gradient-settings.block-editor-panel-color-gradient-settings {
 	&,
 	& > div:not(:first-of-type) {
@@ -33,7 +27,6 @@ $swatch-gap: 12px;
 		.components-circular-option-picker__swatches {
 			display: grid;
 			grid-template-columns: repeat(6, $swatch-size);
-			justify-content: space-between;
 		}
 	}
 
@@ -71,22 +64,25 @@ $swatch-gap: 12px;
 .block-editor-tools-panel-color-gradient-settings__item {
 	padding: 0;
 	max-width: 100%;
+	position: relative;
 
 	// Border styles.
 	border-left: 1px solid $gray-300;
 	border-right: 1px solid $gray-300;
 	border-bottom: 1px solid $gray-300;
 
-	&.first {
+	// Identify the first visible instance as placeholder items will not have this class.
+	&:nth-child(1 of &) {
 		margin-top: $grid-unit-30;
-		border-top-left-radius: $radius-block-ui;
-		border-top-right-radius: $radius-block-ui;
+		border-top-left-radius: $radius-small;
+		border-top-right-radius: $radius-small;
 		border-top: 1px solid $gray-300;
 	}
 
-	&.last {
-		border-bottom-left-radius: $radius-block-ui;
-		border-bottom-right-radius: $radius-block-ui;
+	// Identify the last visible instance as placeholder items will not have this class.
+	&:nth-last-child(1 of &) {
+		border-bottom-left-radius: $radius-small;
+		border-bottom-right-radius: $radius-small;
 	}
 
 	> div,
@@ -115,6 +111,7 @@ $swatch-gap: 12px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		max-width: calc(100% - ($button-size-next-default-40px + $grid-unit-05));
 	}
 }
 
@@ -123,5 +120,31 @@ $swatch-gap: 12px;
 
 	.component-color-indicator {
 		flex-shrink: 0;
+	}
+}
+
+.block-editor-panel-color-gradient-settings__reset {
+	position: absolute;
+	right: 0;
+	top: $grid-unit;
+	margin: auto $grid-unit auto;
+	opacity: 0;
+	@media not ( prefers-reduced-motion ) {
+		transition: opacity 0.1s ease-in-out;
+	}
+
+	&.block-editor-panel-color-gradient-settings__reset {
+		border-radius: $radius-small;
+	}
+
+	.block-editor-panel-color-gradient-settings__dropdown:hover + &,
+	&:focus,
+	&:hover {
+		opacity: 1;
+	}
+
+	@media (hover: none) {
+		// Show reset button on devices that do not support hover.
+		opacity: 1;
 	}
 }

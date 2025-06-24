@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,8 +16,8 @@ import { close } from '@wordpress/icons';
  */
 import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
-import type { SyntheticEvent } from 'react';
 import type { DeprecatedButtonProps } from '../button/types';
+import { VisuallyHidden } from '../visually-hidden';
 
 const noop = () => {};
 
@@ -45,10 +45,23 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 		case 'warning':
 		case 'info':
 			return 'polite';
-
-		case 'error':
+		// The default will also catch the 'error' status.
 		default:
 			return 'assertive';
+	}
+}
+
+function getStatusLabel( status: NoticeProps[ 'status' ] ) {
+	switch ( status ) {
+		case 'warning':
+			return __( 'Warning notice' );
+		case 'info':
+			return __( 'Information notice' );
+		case 'error':
+			return __( 'Error notice' );
+		// The default will also catch the 'success' status.
+		default:
+			return __( 'Notice' );
 	}
 }
 
@@ -80,27 +93,22 @@ function Notice( {
 }: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
-	const classes = classnames(
-		className,
-		'components-notice',
-		'is-' + status,
-		{
-			'is-dismissible': isDismissible,
-		}
-	);
+	const classes = clsx( className, 'components-notice', 'is-' + status, {
+		'is-dismissible': isDismissible,
+	} );
 
 	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event: SyntheticEvent ) => {
-		event?.preventDefault?.();
+	const onDismissNotice = () => {
 		onDismiss();
 		onRemove();
 	};
 
 	return (
 		<div className={ classes }>
+			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			<div className="components-notice__content">
 				{ children }
 				<div className="components-notice__actions">
@@ -134,11 +142,12 @@ function Notice( {
 
 							return (
 								<Button
+									__next40pxDefaultSize
 									key={ index }
 									href={ url }
 									variant={ computedVariant }
 									onClick={ url ? undefined : onClick }
-									className={ classnames(
+									className={ clsx(
 										'components-notice__action',
 										buttonCustomClasses
 									) }
@@ -152,11 +161,11 @@ function Notice( {
 			</div>
 			{ isDismissible && (
 				<Button
+					size="small"
 					className="components-notice__dismiss"
 					icon={ close }
-					label={ __( 'Dismiss this notice' ) }
+					label={ __( 'Close' ) }
 					onClick={ onDismissNotice }
-					showTooltip={ false }
 				/>
 			) }
 		</div>

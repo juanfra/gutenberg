@@ -3,7 +3,6 @@
  */
 const { command } = require( 'execa' );
 const npmPackageArg = require( 'npm-package-arg' );
-const { join } = require( 'path' );
 const writePkg = require( 'write-pkg' );
 
 /**
@@ -25,14 +24,13 @@ module.exports = async ( {
 	customScripts,
 	isDynamicVariant,
 	customPackageJSON,
+	rootDirectory,
 } ) => {
-	const cwd = join( process.cwd(), slug );
-
 	info( '' );
 	info( 'Creating a "package.json" file.' );
 
 	await writePkg(
-		cwd,
+		rootDirectory,
 		Object.fromEntries(
 			Object.entries( {
 				name: slug,
@@ -44,17 +42,19 @@ module.exports = async ( {
 				main: wpScripts && 'build/index.js',
 				scripts: {
 					...( wpScripts && {
-						build: isDynamicVariant
-							? 'wp-scripts build --webpack-copy-php'
-							: 'wp-scripts build',
+						build:
+							( isDynamicVariant
+								? 'wp-scripts build --webpack-copy-php'
+								: 'wp-scripts build' ) + ' --blocks-manifest',
 						format: 'wp-scripts format',
 						'lint:css': 'wp-scripts lint-style',
 						'lint:js': 'wp-scripts lint-js',
 						'packages-update': 'wp-scripts packages-update',
 						'plugin-zip': 'wp-scripts plugin-zip',
-						start: isDynamicVariant
-							? 'wp-scripts start --webpack-copy-php'
-							: 'wp-scripts start',
+						start:
+							( isDynamicVariant
+								? 'wp-scripts start --webpack-copy-php'
+								: 'wp-scripts start' ) + ' --blocks-manifest',
 					} ),
 					...( wpEnv && { env: 'wp-env' } ),
 					...customScripts,
@@ -92,7 +92,7 @@ module.exports = async ( {
 					info( '' );
 					info( `Installing "${ packageArg }".` );
 					await command( `npm install ${ packageArg }`, {
-						cwd,
+						cwd: rootDirectory,
 					} );
 				} catch ( { message } ) {
 					info( '' );
@@ -115,7 +115,7 @@ module.exports = async ( {
 					info( '' );
 					info( `Installing "${ packageArg }".` );
 					await command( `npm install ${ packageArg } --save-dev`, {
-						cwd,
+						cwd: rootDirectory,
 					} );
 				} catch ( { message } ) {
 					info( '' );

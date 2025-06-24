@@ -105,7 +105,7 @@ const getCommentsPlaceholder = ( {
  * @param {Array}  [props.firstCommentId]     - ID of the first comment in the array.
  * @param {Array}  [props.blocks]             - Array of blocks returned from
  *                                            getBlocks() in parent .
- * @return {WPElement}                 		Inner blocks of the Comment Template
+ * @return {Element}                 		Inner blocks of the Comment Template
  */
 function CommentTemplateInnerBlocks( {
 	comment,
@@ -168,7 +168,7 @@ const CommentTemplatePreview = ( {
 	};
 
 	// We have to hide the preview block if the `comment` props points to
-	// the curently active block!
+	// the currently active block!
 
 	// Or, to put it differently, every preview block is visible unless it is the
 	// currently active block - in this case we render its inner blocks.
@@ -202,7 +202,7 @@ const MemoizedCommentTemplatePreview = memo( CommentTemplatePreview );
  * @param {Array}  [props.blocks]             - Array of blocks returned from getBlocks() in parent.
  * @param {Object} [props.firstCommentId]     - The ID of the first comment in the array of
  *                                            comment objects.
- * @return {WPElement}                 		List of comments.
+ * @return {Element}                 		List of comments.
  */
 const CommentsList = ( {
 	comments,
@@ -222,7 +222,7 @@ const CommentsList = ( {
 						// "placeholder" and that the block is most likely being used in the
 						// site editor. In this case, we have to set the commentId to `null`
 						// because otherwise the (non-existent) comment with a negative ID
-						// would be reqested from the REST API.
+						// would be requested from the REST API.
 						commentId: commentId < 0 ? null : commentId,
 					} }
 				>

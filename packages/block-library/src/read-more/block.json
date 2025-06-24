@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"content": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"linkTarget": {
 			"type": "string",
@@ -50,6 +51,9 @@
 			"__experimentalDefaultControls": {
 				"width": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-read-more"

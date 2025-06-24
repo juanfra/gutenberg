@@ -13,13 +13,28 @@
 			"default": false
 		},
 		"summary": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "summary",
+			"role": "content"
+		},
+		"name": {
 			"type": "string",
-			"source": "html",
-			"selector": "summary"
+			"source": "attribute",
+			"attribute": "name",
+			"selector": ".wp-block-details"
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"placeholder": {
+			"type": "string"
 		}
 	},
 	"supports": {
+		"__experimentalOnEnter": true,
 		"align": [ "wide", "full" ],
+		"anchor": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -58,6 +73,9 @@
 		},
 		"layout": {
 			"allowEditing": false
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-details-editor",

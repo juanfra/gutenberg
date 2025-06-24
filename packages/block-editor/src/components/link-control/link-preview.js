@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,11 +10,15 @@ import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
-	__experimentalText as Text,
+	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
+import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit } from '@wordpress/icons';
+import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -23,14 +27,33 @@ import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
 
+/**
+ * Filters the title for display. Removes the protocol and www prefix.
+ *
+ * @param {string} title The title to be filtered.
+ *
+ * @return {string} The filtered title.
+ */
+function filterTitleForDisplay( title ) {
+	// Derived from `filterURLForDisplay` in `@wordpress/url`.
+	return title
+		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
+		.replace( /^www\./i, '' );
+}
+
 export default function LinkPreview( {
 	value,
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
-	additionalControls,
 } ) {
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -40,7 +63,7 @@ export default function LinkPreview( {
 	const hasRichData = richData && Object.keys( richData ).length;
 
 	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
+		( value && filterURLForDisplay( safeDecodeURI( value.url ), 24 ) ) ||
 		'';
 
 	// url can be undefined if the href attribute is unset
@@ -49,6 +72,9 @@ export default function LinkPreview( {
 	const displayTitle =
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
+
+	const isUrlRedundant =
+		! value?.url || filterTitleForDisplay( displayTitle ) === displayURL;
 
 	let icon;
 
@@ -60,10 +86,19 @@ export default function LinkPreview( {
 		icon = <Icon icon={ globe } />;
 	}
 
+	const { createNotice } = useDispatch( noticesStore );
+	const ref = useCopyToClipboard( value.url, () => {
+		createNotice( 'info', __( 'Link copied to clipboard.' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	} );
+
 	return (
 		<div
-			aria-label={ __( 'Currently selected' ) }
-			className={ classnames( 'block-editor-link-control__search-item', {
+			role="group"
+			aria-label={ __( 'Manage link' ) }
+			className={ clsx( 'block-editor-link-control__search-item', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -73,9 +108,16 @@ export default function LinkPreview( {
 			} ) }
 		>
 			<div className="block-editor-link-control__search-item-top">
-				<span className="block-editor-link-control__search-item-header">
+				<span
+					className="block-editor-link-control__search-item-header"
+					role="figure"
+					aria-label={
+						/* translators: Accessibility text for the link preview when editing a link. */
+						__( 'Link information' )
+					}
+				>
 					<span
-						className={ classnames(
+						className={ clsx(
 							'block-editor-link-control__search-item-icon',
 							{
 								'is-image': richData?.icon,
@@ -91,12 +133,15 @@ export default function LinkPreview( {
 									className="block-editor-link-control__search-item-title"
 									href={ value.url }
 								>
-									{ displayTitle }
+									<Truncate numberOfLines={ 1 }>
+										{ displayTitle }
+									</Truncate>
 								</ExternalLink>
-
-								{ value?.url && displayTitle !== displayURL && (
+								{ ! isUrlRedundant && (
 									<span className="block-editor-link-control__search-item-info">
-										{ displayURL }
+										<Truncate numberOfLines={ 1 }>
+											{ displayURL }
+										</Truncate>
 									</span>
 								) }
 							</>
@@ -107,69 +152,33 @@ export default function LinkPreview( {
 						) }
 					</span>
 				</span>
-
 				<Button
 					icon={ edit }
-					label={ __( 'Edit' ) }
-					className="block-editor-link-control__search-item-action"
+					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
-					iconSize={ 24 }
+					size="compact"
+					showTooltip={ ! showIconLabels }
 				/>
 				{ hasUnlinkControl && (
 					<Button
 						icon={ linkOff }
-						label={ __( 'Unlink' ) }
-						className="block-editor-link-control__search-item-action block-editor-link-control__unlink"
+						label={ __( 'Remove link' ) }
 						onClick={ onRemove }
-						iconSize={ 24 }
+						size="compact"
+						showTooltip={ ! showIconLabels }
 					/>
 				) }
+				<Button
+					icon={ copySmall }
+					label={ __( 'Copy link' ) }
+					ref={ ref }
+					accessibleWhenDisabled
+					disabled={ isEmptyURL }
+					size="compact"
+					showTooltip={ ! showIconLabels }
+				/>
 				<ViewerSlot fillProps={ value } />
 			</div>
-
-			{ !! (
-				( hasRichData &&
-					( richData?.image || richData?.description ) ) ||
-				isFetching
-			) && (
-				<div className="block-editor-link-control__search-item-bottom">
-					{ ( richData?.image || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.image }
-							className={ classnames(
-								'block-editor-link-control__search-item-image',
-								{
-									'is-placeholder': ! richData?.image,
-								}
-							) }
-						>
-							{ richData?.image && (
-								<img src={ richData?.image } alt="" />
-							) }
-						</div>
-					) }
-
-					{ ( richData?.description || isFetching ) && (
-						<div
-							aria-hidden={ ! richData?.description }
-							className={ classnames(
-								'block-editor-link-control__search-item-description',
-								{
-									'is-placeholder': ! richData?.description,
-								}
-							) }
-						>
-							{ richData?.description && (
-								<Text truncate numberOfLines="2">
-									{ richData.description }
-								</Text>
-							) }
-						</div>
-					) }
-				</div>
-			) }
-
-			{ additionalControls && additionalControls() }
 		</div>
 	);
 }

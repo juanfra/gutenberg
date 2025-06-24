@@ -1,63 +1,104 @@
 /**
  * WordPress dependencies
  */
-import { useCommand } from '@wordpress/commands';
+import { useCommand, useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { external, plus, symbol } from '@wordpress/icons';
-import { addQueryArgs, getPath } from '@wordpress/url';
+import { plus } from '@wordpress/icons';
+import { getPath } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback, useMemo } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
 /**
  * Internal dependencies
  */
-import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
 import { unlock } from './lock-unlock';
 
 const { useHistory } = unlock( routerPrivateApis );
 
+const getAddNewPageCommand = () =>
+	function useAddNewPageCommand() {
+		const isSiteEditor = getPath( window.location.href )?.includes(
+			'site-editor.php'
+		);
+		const history = useHistory();
+		const isBlockBasedTheme = useSelect( ( select ) => {
+			return select( coreStore ).getCurrentTheme()?.is_block_theme;
+		}, [] );
+		const { saveEntityRecord } = useDispatch( coreStore );
+		const { createErrorNotice } = useDispatch( noticesStore );
+
+		const createPageEntity = useCallback(
+			async ( { close } ) => {
+				try {
+					const page = await saveEntityRecord(
+						'postType',
+						'page',
+						{
+							status: 'draft',
+						},
+						{
+							throwOnError: true,
+						}
+					);
+					if ( page?.id ) {
+						history.navigate( `/page/${ page.id }?canvas=edit` );
+					}
+				} catch ( error ) {
+					const errorMessage =
+						error.message && error.code !== 'unknown_error'
+							? error.message
+							: __(
+									'An error occurred while creating the item.'
+							  );
+
+					createErrorNotice( errorMessage, {
+						type: 'snackbar',
+					} );
+				} finally {
+					close();
+				}
+			},
+			[ createErrorNotice, history, saveEntityRecord ]
+		);
+
+		const commands = useMemo( () => {
+			const addNewPage =
+				isSiteEditor && isBlockBasedTheme
+					? createPageEntity
+					: () =>
+							( document.location.href =
+								'post-new.php?post_type=page' );
+			return [
+				{
+					name: 'core/add-new-page',
+					label: __( 'Add new page' ),
+					icon: plus,
+					callback: addNewPage,
+				},
+			];
+		}, [ createPageEntity, isSiteEditor, isBlockBasedTheme ] );
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
 export function useAdminNavigationCommands() {
-	const history = useHistory();
-	const isTemplatesAccessible = useIsTemplatesAccessible();
-	const isBlockBasedTheme = useIsBlockBasedTheme();
-
-	const isSiteEditor = getPath( window.location.href )?.includes(
-		'site-editor.php'
-	);
-
 	useCommand( {
 		name: 'core/add-new-post',
 		label: __( 'Add new post' ),
 		icon: plus,
 		callback: () => {
-			document.location.href = 'post-new.php';
+			document.location.assign( 'post-new.php' );
 		},
 	} );
-	useCommand( {
+
+	useCommandLoader( {
 		name: 'core/add-new-page',
-		label: __( 'Add new page' ),
-		icon: plus,
-		callback: () => {
-			document.location.href = 'post-new.php?post_type=page';
-		},
-	} );
-	useCommand( {
-		name: 'core/manage-reusable-blocks',
-		label: __( 'Open patterns' ),
-		callback: ( { close } ) => {
-			if ( isTemplatesAccessible && isBlockBasedTheme ) {
-				const args = {
-					path: '/patterns',
-				};
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = addQueryArgs( 'site-editor.php', args );
-				}
-				close();
-			} else {
-				document.location.href = 'edit.php?post_type=wp_block';
-			}
-		},
-		icon: isSiteEditor ? symbol : external,
+		hook: getAddNewPageCommand(),
 	} );
 }

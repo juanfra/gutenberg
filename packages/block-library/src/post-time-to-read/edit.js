@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -66,19 +66,19 @@ function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
 		const minutesToRead = Math.max(
 			1,
 			Math.round(
-				wordCount( content, wordCountType ) / AVERAGE_READING_RATE
+				wordCount( content || '', wordCountType ) / AVERAGE_READING_RATE
 			)
 		);
 
 		return sprintf(
-			/* translators: %d is the number of minutes the post will take to read. */
-			_n( '%d minute', '%d minutes', minutesToRead ),
+			/* translators: %s: the number of minutes to read the post. */
+			_n( '%s minute', '%s minutes', minutesToRead ),
 			minutesToRead
 		);
 	}, [ contentStructure, blocks ] );
 
 	const blockProps = useBlockProps( {
-		className: classnames( {
+		className: clsx( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );

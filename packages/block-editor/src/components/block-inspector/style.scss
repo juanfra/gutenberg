@@ -10,18 +10,21 @@
 		margin-bottom: 1.5em;
 	}
 
-	.components-base-control {
-		margin-bottom: #{ $grid-unit-30 };
-
-		&:last-child {
-			margin-bottom: $grid-unit-10;
+	.components-base-control,
+	.components-radio-control,
+	.block-editor-html-element-control,
+	.block-editor-image-size-control {
+		&:where(:not(:last-child)) {
+			margin-bottom: $grid-unit-20;
 		}
 	}
 
 	// Reset unwanted margin-bottom from being applied to BaseControls within certain components.
 	.components-focal-point-picker-control,
 	.components-query-controls,
-	.components-range-control {
+	.components-range-control,
+	.block-editor-html-element-control,
+	.block-editor-image-size-control {
 		.components-base-control {
 			margin-bottom: 0;
 		}
@@ -33,10 +36,6 @@
 
 		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
 		margin-top: -$border-width;
-	}
-
-	.block-editor-block-card {
-		padding: $grid-unit-20;
 	}
 }
 
@@ -51,8 +50,4 @@
 
 .block-editor-block-inspector__no-block-tools {
 	border-top: $border-width solid $gray-300;
-}
-
-.block-editor-block-inspector__tab-item {
-	flex: 1 1 0px;
 }

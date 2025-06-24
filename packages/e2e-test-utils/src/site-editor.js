@@ -44,11 +44,11 @@ export async function disableSiteEditorWelcomeGuide() {
 export function getCurrentSiteEditorContent() {
 	return page.evaluate( () => {
 		const postId = window.wp.data
-			.select( 'core/edit-site' )
-			.getEditedPostId();
+			.select( 'core/editor' )
+			.getCurrentPostId();
 		const postType = window.wp.data
-			.select( 'core/edit-site' )
-			.getEditedPostType();
+			.select( 'core/editor' )
+			.getCurrentPostType();
 		const record = window.wp.data
 			.select( 'core' )
 			.getEditedEntityRecord( 'postType', postType, postId );
@@ -97,9 +97,7 @@ export async function visitSiteEditor( query, skipWelcomeGuide = true ) {
  * Toggles the global styles sidebar (opens it if closed and closes it if open).
  */
 export async function toggleGlobalStyles() {
-	await page.click(
-		'.edit-site-header-edit-mode__actions button[aria-label="Styles"]'
-	);
+	await page.click( '.editor-header__settings button[aria-label="Styles"]' );
 }
 
 /**
@@ -117,7 +115,7 @@ export async function openGlobalStylesPanel( panelName ) {
  */
 export async function openPreviousGlobalStylesPanel() {
 	await page.click(
-		'div[aria-label="Editor settings"] button[aria-label="Navigate to the previous view"]'
+		'div[aria-label="Editor settings"] button[aria-label="Back"]'
 	);
 }
 

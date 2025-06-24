@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -15,10 +15,10 @@ import { cloneElement, forwardRef } from '@wordpress/element';
 import Shortcut from '../shortcut';
 import Button from '../button';
 import Icon from '../icon';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { MenuItemProps } from './types';
 
-export function MenuItem(
+function UnforwardedMenuItem(
 	props: WordPressComponentProps< MenuItemProps, 'button', false >,
 	ref: ForwardedRef< HTMLButtonElement >
 ) {
@@ -35,7 +35,7 @@ export function MenuItem(
 		...buttonProps
 	} = props;
 
-	className = classnames( 'components-menu-item__button', className );
+	className = clsx( 'components-menu-item__button', className );
 
 	if ( info ) {
 		children = (
@@ -48,7 +48,7 @@ export function MenuItem(
 
 	if ( icon && typeof icon !== 'string' ) {
 		icon = cloneElement( icon, {
-			className: classnames( 'components-menu-items__item-icon', {
+			className: clsx( 'components-menu-items__item-icon', {
 				'has-icon-right': iconPosition === 'right',
 			} ),
 		} );
@@ -56,6 +56,7 @@ export function MenuItem(
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			ref={ ref }
 			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
 			aria-checked={
@@ -97,6 +98,7 @@ export function MenuItem(
  * 		<MenuItem
  * 			icon={ isActive ? 'yes' : 'no' }
  * 			isSelected={ isActive }
+ * 			role="menuitemcheckbox"
  * 			onClick={ () => setIsActive( ( state ) => ! state ) }
  * 		>
  * 			Toggle
@@ -105,4 +107,6 @@ export function MenuItem(
  * };
  * ```
  */
-export default forwardRef( MenuItem );
+export const MenuItem = forwardRef( UnforwardedMenuItem );
+
+export default MenuItem;

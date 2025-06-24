@@ -1,11 +1,6 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-/**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,6 +11,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import deprecated from '@wordpress/deprecated';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -47,6 +43,7 @@ const LinkControlSearchInput = forwardRef(
 			withURLSuggestion = true,
 			createSuggestionButtonText,
 			hideLabelFromVision = false,
+			suffix,
 		},
 		ref
 	) => {
@@ -61,7 +58,6 @@ const LinkControlSearchInput = forwardRef(
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
 
-		const instanceId = useInstanceId( LinkControlSearchInput );
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
 
 		/**
@@ -79,7 +75,6 @@ const LinkControlSearchInput = forwardRef(
 		const handleRenderSuggestions = ( props ) =>
 			renderSuggestions( {
 				...props,
-				instanceId,
 				withCreateSuggestion,
 				createSuggestionButtonText,
 				suggestionsQuery,
@@ -119,26 +114,21 @@ const LinkControlSearchInput = forwardRef(
 			}
 		};
 
-		const inputClasses = classnames( className, {
-			// 'has-no-label': ! hideLabelFromVision,
-		} );
-
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
 					disableSuggestions={ currentLink?.url === value }
-					__nextHasNoMarginBottom
 					label={ __( 'Link' ) }
 					hideLabelFromVision={ hideLabelFromVision }
-					className={ inputClasses }
+					className={ className }
 					value={ value }
 					onChange={ onInputChange }
-					placeholder={ placeholder ?? __( 'Search or type url' ) }
+					placeholder={ placeholder ?? __( 'Search or type URL' ) }
 					__experimentalRenderSuggestions={
 						showSuggestions ? handleRenderSuggestions : null
 					}
 					__experimentalFetchLinkSuggestions={ searchHandler }
-					__experimentalHandleURLSuggestions={ true }
+					__experimentalHandleURLSuggestions
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
@@ -156,6 +146,7 @@ const LinkControlSearchInput = forwardRef(
 						}
 					} }
 					ref={ ref }
+					suffix={ suffix }
 				/>
 				{ children }
 			</div>
@@ -164,3 +155,11 @@ const LinkControlSearchInput = forwardRef(
 );
 
 export default LinkControlSearchInput;
+
+export const __experimentalLinkControlSearchInput = ( props ) => {
+	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchInput', {
+		since: '6.8',
+	} );
+
+	return <LinkControlSearchInput { ...props } />;
+};

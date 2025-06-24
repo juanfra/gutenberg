@@ -42,13 +42,14 @@ const JUSTIFICATIONS = {
 
 const meta: Meta< typeof HStack > = {
 	component: HStack,
-	title: 'Components (Experimental)/HStack',
+	title: 'Components (Experimental)/Layout/HStack',
+	id: 'components-experimental-hstack',
 	argTypes: {
 		as: {
-			control: { type: null },
+			control: false,
 		},
 		children: {
-			control: { type: null },
+			control: false,
 		},
 		alignment: {
 			control: { type: 'select' },

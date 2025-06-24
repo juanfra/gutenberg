@@ -2,16 +2,22 @@
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const got = require( 'got' );
+const dns = require( 'dns' ).promises;
 
 /**
  * Promisified dependencies
  */
 const copyDir = util.promisify( require( 'copy-dir' ) );
+
+/**
+ * Internal dependencies
+ */
+const { getCache, setCache } = require( './cache' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -20,6 +26,30 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  * @typedef {'development'|'tests'} WPEnvironment
  * @typedef {'development'|'tests'|'all'} WPEnvironmentSelection
  */
+
+/**
+ * Utility function to check if a WordPress version is lower than another version.
+ *
+ * This is a non-comprehensive check only intended for this usage, to avoid pulling in a full semver library.
+ * It only considers the major and minor portions of the version and ignores the rest. Additionally, it assumes that
+ * the minor version is always a single digit (i.e. 0-9).
+ *
+ * Do not use this function for general version comparison, as it will not work for all cases.
+ *
+ * @param {string} version        The version to check.
+ * @param {string} compareVersion The compare version to check whether the version is lower than.
+ * @return {boolean} True if the version is lower than the compare version, false otherwise.
+ */
+function isWPMajorMinorVersionLower( version, compareVersion ) {
+	const versionNumber = Number.parseFloat(
+		version.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
+	);
+	const compareVersionNumber = Number.parseFloat(
+		compareVersion.match( /^[0-9]+(\.[0-9]+)?/ )[ 0 ]
+	);
+
+	return versionNumber < compareVersionNumber;
+}
 
 /**
  * Checks a WordPress database connection. An error is thrown if the test is
@@ -45,10 +75,56 @@ async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
  * @param {Object}        spinner     A CLI spinner which indicates progress.
  */
 async function configureWordPress( environment, config, spinner ) {
-	const installCommand = `wp core install --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	let wpVersion = '';
+	try {
+		wpVersion = await readWordPressVersion(
+			config.env[ environment ].coreSource,
+			spinner,
+			config.debug
+		);
+	} catch ( err ) {
+		// Ignore error.
+	}
+
+	const isMultisite = config.env[ environment ].multisite;
+
+	const installMethod = isMultisite ? 'multisite-install' : 'install';
+	const installCommand = `wp core ${ installMethod } --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [ 'set -eo pipefail', installCommand ];
+
+	// Bootstrap .htaccess for multisite
+	if ( isMultisite ) {
+		// Using a subshell with `exec` was the best tradeoff I could come up
+		// with between readability of this source and compatibility with the
+		// way that all strings in `setupCommands` are later joined with '&&'.
+		setupCommands.push(
+			`(
+exec > /var/www/html/.htaccess
+echo 'RewriteEngine On'
+echo 'RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]'
+echo 'RewriteBase /'
+echo 'RewriteRule ^index\.php$ - [L]'
+echo ''
+echo '# add a trailing slash to /wp-admin'
+echo 'RewriteRule ^([_0-9a-zA-Z-]+/)?wp-admin$ $1wp-admin/ [R=301,L]'
+echo ''
+echo 'RewriteCond %{REQUEST_FILENAME} -f [OR]'
+echo 'RewriteCond %{REQUEST_FILENAME} -d'
+echo 'RewriteRule ^ - [L]'
+echo 'RewriteRule ^([_0-9a-zA-Z-]+/)?(wp-(content|admin|includes).*) $2 [L]'
+echo 'RewriteRule ^([_0-9a-zA-Z-]+/)?(.*\.php)$ $2 [L]'
+echo 'RewriteRule . index.php [L]'
+)`
+		);
+	}
+
+	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
+	const configAnchor =
+		wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' )
+			? `"define('WP_DEBUG',"`
+			: `"define( 'WP_DEBUG',"`;
 
 	// Set wp-config.php values.
 	for ( let [ key, value ] of Object.entries(
@@ -62,7 +138,7 @@ async function configureWordPress( environment, config, spinner ) {
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
-			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
+			`wp config set ${ key } ${ value } --anchor=${ configAnchor }${
 				typeof value !== 'string' ? ' --raw' : ''
 			}`
 		);
@@ -92,6 +168,15 @@ async function configureWordPress( environment, config, spinner ) {
 		}
 	);
 
+	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
+	// Additionally, WordPress versions below 5.4 used `dirname( __FILE__ )` instead of `__DIR__`.
+	let abspathDef = `define( 'ABSPATH', __DIR__ . '\\/' );`;
+	if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.1' ) ) {
+		abspathDef = `define('ABSPATH', dirname(__FILE__) . '\\/');`;
+	} else if ( wpVersion && isWPMajorMinorVersionLower( wpVersion, '5.4' ) ) {
+		abspathDef = `define( 'ABSPATH', dirname( __FILE__ ) . '\\/' );`;
+	}
+
 	// WordPress' PHPUnit suite expects a `wp-tests-config.php` in
 	// the directory that the test suite is contained within.
 	// Make sure ABSPATH points to the WordPress install.
@@ -100,7 +185,7 @@ async function configureWordPress( environment, config, spinner ) {
 		[
 			'sh',
 			'-c',
-			`sed -e "/^require.*wp-settings.php/d" -e "s/define( 'ABSPATH', __DIR__ . '\\/' );/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
+			`sed -e "/^require.*wp-settings.php/d" -e "s/${ abspathDef }/define( 'ABSPATH', '\\/var\\/www\\/html\\/' );\\n\\tdefine( 'WP_DEFAULT_THEME', 'default' );/" /var/www/html/wp-config.php > /wordpress-phpunit/wp-tests-config.php`,
 		],
 		{
 			config: config.dockerComposeConfigPath,
@@ -244,16 +329,51 @@ async function readWordPressVersion( coreSource, spinner, debug ) {
 }
 
 /**
+ * Basically a quick check to see if we can connect to the internet.
+ *
+ * @return {boolean} True if we can connect to WordPress.org, false otherwise.
+ */
+let IS_OFFLINE;
+async function canAccessWPORG() {
+	// Avoid situations where some parts of the code think we're offline and others don't.
+	if ( IS_OFFLINE !== undefined ) {
+		return IS_OFFLINE;
+	}
+	IS_OFFLINE = !! ( await dns.resolve( 'WordPress.org' ).catch( () => {} ) );
+	return IS_OFFLINE;
+}
+
+/**
  * Returns the latest stable version of WordPress by requesting the stable-check
  * endpoint on WordPress.org.
  *
+ * @param {Object} options an object with cacheDirectoryPath set to the path to the cache directory in ~/.wp-env.
  * @return {string} The latest stable version of WordPress, like "6.0.1"
  */
 let CACHED_WP_VERSION;
-async function getLatestWordPressVersion() {
+async function getLatestWordPressVersion( options ) {
 	// Avoid extra network requests.
 	if ( CACHED_WP_VERSION ) {
 		return CACHED_WP_VERSION;
+	}
+
+	const cacheOptions = {
+		workDirectoryPath: options.cacheDirectoryPath,
+	};
+
+	// When we can't connect to the internet, we don't want to break wp-env or
+	// wait for the stable-check result to timeout.
+	if ( ! ( await canAccessWPORG() ) ) {
+		const latestVersion = await getCache(
+			'latestWordPressVersion',
+			cacheOptions
+		);
+		if ( ! latestVersion ) {
+			throw new Error(
+				'Could not find the current WordPress version in the cache and the network is not available.'
+			);
+		}
+		return latestVersion;
 	}
 
 	const versions = await got(
@@ -263,6 +383,7 @@ async function getLatestWordPressVersion() {
 	for ( const [ version, status ] of Object.entries( versions ) ) {
 		if ( status === 'latest' ) {
 			CACHED_WP_VERSION = version;
+			await setCache( 'latestWordPressVersion', version, cacheOptions );
 			return version;
 		}
 	}
@@ -275,5 +396,6 @@ module.exports = {
 	resetDatabase,
 	setupWordPressDirectories,
 	readWordPressVersion,
+	canAccessWPORG,
 	getLatestWordPressVersion,
 };

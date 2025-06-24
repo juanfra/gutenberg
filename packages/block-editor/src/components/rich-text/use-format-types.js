@@ -29,7 +29,9 @@ const interactiveContentTags = new Set( [
 ] );
 
 function prefixSelectKeys( selected, prefix ) {
-	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
+	if ( typeof selected !== 'object' ) {
+		return { [ prefix ]: selected };
+	}
 	return Object.fromEntries(
 		Object.entries( selected ).map( ( [ key, value ] ) => [
 			`${ prefix }.${ key }`,
@@ -39,7 +41,9 @@ function prefixSelectKeys( selected, prefix ) {
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {
-	if ( selected[ prefix ] ) return selected[ prefix ];
+	if ( selected[ prefix ] ) {
+		return selected[ prefix ];
+	}
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
 		.reduce( ( accumulator, key ) => {
@@ -55,7 +59,7 @@ function getPrefixedSelectKeys( selected, prefix ) {
  * @param {Object}  $0                              Options
  * @param {string}  $0.clientId                     Block client ID.
  * @param {string}  $0.identifier                   Block attribute.
- * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formattings or not.
+ * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formatting or not.
  * @param {Array}   $0.allowedFormats               Allowed formats
  */
 export function useFormatTypes( {

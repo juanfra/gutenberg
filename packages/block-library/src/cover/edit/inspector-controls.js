@@ -3,16 +3,13 @@
  */
 import { useMemo } from '@wordpress/element';
 import {
-	Button,
 	ExternalLink,
 	FocalPointPicker,
-	PanelBody,
-	PanelRow,
 	RangeControl,
 	TextareaControl,
 	ToggleControl,
-	SelectControl,
 	__experimentalUseCustomUnits as useCustomUnits,
+	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
@@ -20,17 +17,28 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import {
 	InspectorControls,
-	useSetting,
+	useSettings,
+	store as blockEditorStore,
 	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
 	__experimentalUseGradient,
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { COVER_MIN_HEIGHT, mediaPosition } from '../shared';
+import { unlock } from '../../lock-unlock';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
+
+const { cleanEmptyObject, ResolutionTool, HTMLElementControl } = unlock(
+	blockEditorPrivateApis
+);
 
 function CoverHeightInput( {
 	onChange,
@@ -42,14 +50,9 @@ function CoverHeightInput( {
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'px',
-			'em',
-			'rem',
-			'vw',
-			'vh',
-		],
+		availableUnits: availableUnits || [ 'px', 'em', 'rem', 'vw', 'vh' ],
 		defaultValues: { px: 430, '%': 20, em: 20, rem: 20, vw: 20, vh: 50 },
 	} );
 
@@ -74,13 +77,13 @@ function CoverHeightInput( {
 
 	return (
 		<UnitControl
-			label={ __( 'Minimum height of cover' ) }
+			__next40pxDefaultSize
+			label={ __( 'Minimum height' ) }
 			id={ inputId }
 			isResetValueOnUnitChange
 			min={ min }
 			onChange={ handleOnChange }
 			onUnitChange={ onUnitChange }
-			__unstableInputWidth={ '80px' }
 			units={ units }
 			value={ computedValue }
 		/>
@@ -94,10 +97,11 @@ export default function CoverInspectorControls( {
 	coverRef,
 	currentSettings,
 	updateDimRatio,
-	onClearMedia,
+	featuredImage,
 } ) {
 	const {
 		useFeaturedImage,
+		id,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -112,11 +116,47 @@ export default function CoverInspectorControls( {
 		isImageBackground,
 		mediaElement,
 		url,
-		isImgElement,
 		overlayColor,
 	} = currentSettings;
 
+	const sizeSlug = attributes.sizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
+
 	const { gradientValue, setGradient } = __experimentalUseGradient();
+	const { getSettings } = useSelect( blockEditorStore );
+
+	const imageSizes = getSettings()?.imageSizes;
+
+	const image = useSelect(
+		( select ) =>
+			id && isImageBackground
+				? select( coreStore ).getMedia( id, { context: 'view' } )
+				: null,
+		[ id, isImageBackground ]
+	);
+
+	const currentBackgroundImage = useFeaturedImage ? featuredImage : image;
+
+	function updateImage( newSizeSlug ) {
+		const newUrl =
+			currentBackgroundImage?.media_details?.sizes?.[ newSizeSlug ]
+				?.source_url;
+		if ( ! newUrl ) {
+			return null;
+		}
+
+		setAttributes( {
+			url: newUrl,
+			sizeSlug: newSizeSlug,
+		} );
+	}
+
+	const imageSizeOptions = imageSizes
+		?.filter(
+			( { slug } ) =>
+				currentBackgroundImage?.media_details?.sizes?.[ slug ]
+					?.source_url
+		)
+		?.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -144,68 +184,100 @@ export default function CoverInspectorControls( {
 
 	const colorGradientSettings = useMultipleOriginColorsAndGradients();
 
-	const htmlElementMessages = {
-		header: __(
-			'The <header> element should represent introductory content, typically a group of introductory or navigational aids.'
-		),
-		main: __(
-			'The <main> element should be used for the primary content of your document only. '
-		),
-		section: __(
-			"The <section> element should represent a standalone portion of the document that can't be better represented by another element."
-		),
-		article: __(
-			'The <article> element should represent a self-contained, syndicatable portion of the document.'
-		),
-		aside: __(
-			"The <aside> element should represent a portion of a document whose content is only indirectly related to the document's main content."
-		),
-		footer: __(
-			'The <footer> element should represent a footer for its nearest sectioning element (e.g.: <section>, <article>, <main> etc.).'
-		),
-	};
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
 		<>
 			<InspectorControls>
 				{ !! url && (
-					<PanelBody title={ __( 'Media settings' ) }>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () => {
+							setAttributes( {
+								hasParallax: false,
+								focalPoint: undefined,
+								isRepeated: false,
+								alt: '',
+								sizeSlug: undefined,
+							} );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
 						{ isImageBackground && (
 							<>
-								<ToggleControl
-									__nextHasNoMarginBottom
+								<ToolsPanelItem
 									label={ __( 'Fixed background' ) }
-									checked={ hasParallax }
-									onChange={ toggleParallax }
-								/>
+									isShownByDefault
+									hasValue={ () => hasParallax }
+									onDeselect={ () =>
+										setAttributes( {
+											hasParallax: false,
+											focalPoint: undefined,
+										} )
+									}
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Fixed background' ) }
+										checked={ hasParallax }
+										onChange={ toggleParallax }
+									/>
+								</ToolsPanelItem>
 
-								<ToggleControl
-									__nextHasNoMarginBottom
+								<ToolsPanelItem
 									label={ __( 'Repeated background' ) }
-									checked={ isRepeated }
-									onChange={ toggleIsRepeated }
-								/>
+									isShownByDefault
+									hasValue={ () => isRepeated }
+									onDeselect={ () =>
+										setAttributes( {
+											isRepeated: false,
+										} )
+									}
+								>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Repeated background' ) }
+										checked={ isRepeated }
+										onChange={ toggleIsRepeated }
+									/>
+								</ToolsPanelItem>
 							</>
 						) }
 						{ showFocalPointPicker && (
-							<FocalPointPicker
-								__nextHasNoMarginBottom
-								label={ __( 'Focal point picker' ) }
-								url={ url }
-								value={ focalPoint }
-								onDragStart={ imperativeFocalPointPreview }
-								onDrag={ imperativeFocalPointPreview }
-								onChange={ ( newFocalPoint ) =>
+							<ToolsPanelItem
+								label={ __( 'Focal point' ) }
+								isShownByDefault
+								hasValue={ () => !! focalPoint }
+								onDeselect={ () =>
 									setAttributes( {
-										focalPoint: newFocalPoint,
+										focalPoint: undefined,
 									} )
 								}
-							/>
+							>
+								<FocalPointPicker
+									__nextHasNoMarginBottom
+									label={ __( 'Focal point' ) }
+									url={ url }
+									value={ focalPoint }
+									onDragStart={ imperativeFocalPointPreview }
+									onDrag={ imperativeFocalPointPreview }
+									onChange={ ( newFocalPoint ) =>
+										setAttributes( {
+											focalPoint: newFocalPoint,
+										} )
+									}
+								/>
+							</ToolsPanelItem>
 						) }
-						{ ! useFeaturedImage &&
-							url &&
-							isImageBackground &&
-							isImgElement && (
+						{ ! useFeaturedImage && url && ! isVideoBackground && (
+							<ToolsPanelItem
+								label={ __( 'Alternative text' ) }
+								isShownByDefault
+								hasValue={ () => !! alt }
+								onDeselect={ () =>
+									setAttributes( { alt: '' } )
+								}
+							>
 								<TextareaControl
 									__nextHasNoMarginBottom
 									label={ __( 'Alternative text' ) }
@@ -215,7 +287,14 @@ export default function CoverInspectorControls( {
 									}
 									help={
 										<>
-											<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
 													'Describe the purpose of the image.'
 												) }
@@ -227,18 +306,17 @@ export default function CoverInspectorControls( {
 										</>
 									}
 								/>
-							) }
-						<PanelRow>
-							<Button
-								variant="secondary"
-								isSmall
-								className="block-library-cover__reset-button"
-								onClick={ onClearMedia }
-							>
-								{ __( 'Clear Media' ) }
-							</Button>
-						</PanelRow>
-					</PanelBody>
+							</ToolsPanelItem>
+						) }
+						{ !! imageSizeOptions?.length && (
+							<ResolutionTool
+								value={ sizeSlug }
+								onChange={ updateImage }
+								options={ imageSizeOptions }
+								defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+							/>
+						) }
+					</ToolsPanel>
 				) }
 			</InspectorControls>
 			{ colorGradientSettings.hasColorsOrGradients && (
@@ -259,6 +337,7 @@ export default function CoverInspectorControls( {
 									gradient: undefined,
 									customGradient: undefined,
 								} ),
+								clearable: true,
 							},
 						] }
 						panelId={ clientId }
@@ -298,6 +377,7 @@ export default function CoverInspectorControls( {
 			) }
 			<InspectorControls group="dimensions">
 				<ToolsPanelItem
+					className="single-column"
 					hasValue={ () => !! minHeight }
 					label={ __( 'Minimum height' ) }
 					onDeselect={ () =>
@@ -310,14 +390,27 @@ export default function CoverInspectorControls( {
 						minHeight: undefined,
 						minHeightUnit: undefined,
 					} ) }
-					isShownByDefault={ true }
+					isShownByDefault
 					panelId={ clientId }
 				>
 					<CoverHeightInput
-						value={ minHeight }
+						value={
+							attributes?.style?.dimensions?.aspectRatio
+								? ''
+								: minHeight
+						}
 						unit={ minHeightUnit }
 						onChange={ ( newMinHeight ) =>
-							setAttributes( { minHeight: newMinHeight } )
+							setAttributes( {
+								minHeight: newMinHeight,
+								style: cleanEmptyObject( {
+									...attributes?.style,
+									dimensions: {
+										...attributes?.style?.dimensions,
+										aspectRatio: undefined, // Reset aspect ratio when minHeight is set.
+									},
+								} ),
+							} )
 						}
 						onUnitChange={ ( nextUnit ) =>
 							setAttributes( {
@@ -328,9 +421,12 @@ export default function CoverInspectorControls( {
 				</ToolsPanelItem>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<SelectControl
-					__nextHasNoMarginBottom
-					label={ __( 'HTML element' ) }
+				<HTMLElementControl
+					tagName={ tagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+					clientId={ clientId }
 					options={ [
 						{ label: __( 'Default (<div>)' ), value: 'div' },
 						{ label: '<header>', value: 'header' },
@@ -340,11 +436,6 @@ export default function CoverInspectorControls( {
 						{ label: '<aside>', value: 'aside' },
 						{ label: '<footer>', value: 'footer' },
 					] }
-					value={ tagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-					help={ htmlElementMessages[ tagName ] }
 				/>
 			</InspectorControls>
 		</>

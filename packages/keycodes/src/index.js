@@ -10,11 +10,6 @@
  */
 
 /**
- * External dependencies
- */
-import { capitalCase } from 'change-case';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -149,6 +144,17 @@ export const ZERO = 48;
 export { isAppleOS };
 
 /**
+ * Capitalise the first character of a string.
+ * @param {string} string String to capitalise.
+ * @return {string} Capitalised string.
+ */
+function capitaliseFirstCharacter( string ) {
+	return string.length < 2
+		? string.toUpperCase()
+		: string.charAt( 0 ).toUpperCase() + string.slice( 1 );
+}
+
+/**
  * Map the values of an object with a specified callback and return the result object.
  *
  * @template {{ [s: string]: any; } | ArrayLike<any>} T
@@ -205,9 +211,9 @@ export const modifiers = {
  * @type {WPModifierHandler<WPKeyHandler<string>>} Keyed map of functions to raw
  *                                                 shortcuts.
  */
-export const rawShortcut = mapValues(
-	modifiers,
-	( /** @type {WPModifier} */ modifier ) => {
+export const rawShortcut =
+	/* @__PURE__ */
+	mapValues( modifiers, ( /** @type {WPModifier} */ modifier ) => {
 		return /** @type {WPKeyHandler<string>} */ (
 			character,
 			_isApple = isAppleOS
@@ -216,8 +222,7 @@ export const rawShortcut = mapValues(
 				'+'
 			);
 		};
-	}
-);
+	} );
 
 /**
  * Return an array of the parts of a keyboard shortcut chord for display.
@@ -232,9 +237,9 @@ export const rawShortcut = mapValues(
  * @type {WPModifierHandler<WPKeyHandler<string[]>>} Keyed map of functions to
  *                                                   shortcut sequences.
  */
-export const displayShortcutList = mapValues(
-	modifiers,
-	( /** @type {WPModifier} */ modifier ) => {
+export const displayShortcutList =
+	/* @__PURE__ */
+	mapValues( modifiers, ( /** @type {WPModifier} */ modifier ) => {
 		return /** @type {WPKeyHandler<string[]>} */ (
 			character,
 			_isApple = isAppleOS
@@ -260,17 +265,9 @@ export const displayShortcutList = mapValues(
 				/** @type {string[]} */ ( [] )
 			);
 
-			// Symbols (~`,.) are removed by the default regular expression,
-			// so override the rule to allow symbols used for shortcuts.
-			// see: https://github.com/blakeembrey/change-case#options
-			const capitalizedCharacter = capitalCase( character, {
-				stripRegexp: /[^A-Z0-9~`,\.\\\-]/gi,
-			} );
-
-			return [ ...modifierKeys, capitalizedCharacter ];
+			return [ ...modifierKeys, capitaliseFirstCharacter( character ) ];
 		};
-	}
-);
+	} );
 
 /**
  * An object that contains functions to display shortcuts.
@@ -285,15 +282,17 @@ export const displayShortcutList = mapValues(
  * @type {WPModifierHandler<WPKeyHandler<string>>} Keyed map of functions to
  *                                                 display shortcuts.
  */
-export const displayShortcut = mapValues(
-	displayShortcutList,
-	( /** @type {WPKeyHandler<string[]>} */ shortcutList ) => {
-		return /** @type {WPKeyHandler<string>} */ (
-			character,
-			_isApple = isAppleOS
-		) => shortcutList( character, _isApple ).join( '' );
-	}
-);
+export const displayShortcut =
+	/* @__PURE__ */
+	mapValues(
+		displayShortcutList,
+		( /** @type {WPKeyHandler<string[]>} */ shortcutList ) => {
+			return /** @type {WPKeyHandler<string>} */ (
+				character,
+				_isApple = isAppleOS
+			) => shortcutList( character, _isApple ).join( '' );
+		}
+	);
 
 /**
  * An object that contains functions to return an aria label for a keyboard
@@ -309,9 +308,9 @@ export const displayShortcut = mapValues(
  * @type {WPModifierHandler<WPKeyHandler<string>>} Keyed map of functions to
  *                                                 shortcut ARIA labels.
  */
-export const shortcutAriaLabel = mapValues(
-	modifiers,
-	( /** @type {WPModifier} */ modifier ) => {
+export const shortcutAriaLabel =
+	/* @__PURE__ */
+	mapValues( modifiers, ( /** @type {WPModifier} */ modifier ) => {
 		return /** @type {WPKeyHandler<string>} */ (
 			character,
 			_isApple = isAppleOS
@@ -335,12 +334,11 @@ export const shortcutAriaLabel = mapValues(
 
 			return [ ...modifier( _isApple ), character ]
 				.map( ( key ) =>
-					capitalCase( replacementKeyMap[ key ] ?? key )
+					capitaliseFirstCharacter( replacementKeyMap[ key ] ?? key )
 				)
 				.join( isApple ? ' ' : ' + ' );
 		};
-	}
-);
+	} );
 
 /**
  * From a given KeyboardEvent, returns an array of active modifier constants for
@@ -380,9 +378,9 @@ function getEventModifiers( event ) {
  * @type {WPModifierHandler<WPEventKeyHandler>} Keyed map of functions
  *                                                       to match events.
  */
-export const isKeyboardEvent = mapValues(
-	modifiers,
-	( /** @type {WPModifier} */ getModifiers ) => {
+export const isKeyboardEvent =
+	/* @__PURE__ */
+	mapValues( modifiers, ( /** @type {WPModifier} */ getModifiers ) => {
 		return /** @type {WPEventKeyHandler} */ (
 			event,
 			character,
@@ -440,5 +438,4 @@ export const isKeyboardEvent = mapValues(
 
 			return key === character.toLowerCase();
 		};
-	}
-);
+	} );

@@ -7,9 +7,16 @@ import {
 	FlexItem,
 	SearchControl,
 	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useDeferredValue,
+	memo,
+} from '@wordpress/element';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
@@ -20,7 +27,7 @@ import { speak } from '@wordpress/a11y';
 /**
  * Internal dependencies
  */
-import { useBlockVariations } from './variations-panel';
+import { useBlockVariations } from './variations/variations-panel';
 import ScreenHeader from './header';
 import { NavigationButtonAsItem } from './navigation-button';
 import { unlock } from '../../lock-unlock';
@@ -80,16 +87,9 @@ function BlockMenuItem( { block } ) {
 		return null;
 	}
 
-	const navigationButtonLabel = sprintf(
-		// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
-		__( '%s block styles' ),
-		block.title
-	);
-
 	return (
 		<NavigationButtonAsItem
 			path={ '/blocks/' + encodeURIComponent( block.name ) }
-			aria-label={ navigationButtonLabel }
 		>
 			<HStack justify="flex-start">
 				<BlockIcon icon={ block.icon } />
@@ -99,22 +99,16 @@ function BlockMenuItem( { block } ) {
 	);
 }
 
-function ScreenBlockList() {
+function BlockList( { filterValue } ) {
 	const sortedBlockTypes = useSortedBlockTypes();
-	const [ filterValue, setFilterValue ] = useState( '' );
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const isMatchingSearchTerm = useSelect(
-		( select ) => select( blocksStore ).isMatchingSearchTerm,
-		[]
-	);
-	const filteredBlockTypes = useMemo( () => {
-		if ( ! filterValue ) {
-			return sortedBlockTypes;
-		}
-		return sortedBlockTypes.filter( ( blockType ) =>
-			isMatchingSearchTerm( blockType, filterValue )
-		);
-	}, [ filterValue, sortedBlockTypes, isMatchingSearchTerm ] );
+	const { isMatchingSearchTerm } = useSelect( blocksStore );
+
+	const filteredBlockTypes = ! filterValue
+		? sortedBlockTypes
+		: sortedBlockTypes.filter( ( blockType ) =>
+				isMatchingSearchTerm( blockType, filterValue )
+		  );
 
 	const blockTypesListRef = useRef();
 
@@ -141,6 +135,35 @@ function ScreenBlockList() {
 	}, [ filterValue, debouncedSpeak ] );
 
 	return (
+		<div
+			ref={ blockTypesListRef }
+			className="edit-site-block-types-item-list"
+			// By default, BlockMenuItem has a role=listitem so this div must have a list role.
+			role="list"
+		>
+			{ filteredBlockTypes.length === 0 ? (
+				<Text align="center" as="p">
+					{ __( 'No blocks found.' ) }
+				</Text>
+			) : (
+				filteredBlockTypes.map( ( block ) => (
+					<BlockMenuItem
+						block={ block }
+						key={ 'menu-itemblock-' + block.name }
+					/>
+				) )
+			) }
+		</div>
+	);
+}
+
+const MemoizedBlockList = memo( BlockList );
+
+function ScreenBlockList() {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const deferredFilterValue = useDeferredValue( filterValue );
+
+	return (
 		<>
 			<ScreenHeader
 				title={ __( 'Blocks' ) }
@@ -153,20 +176,10 @@ function ScreenBlockList() {
 				className="edit-site-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }
-				label={ __( 'Search for blocks' ) }
+				label={ __( 'Search' ) }
 				placeholder={ __( 'Search' ) }
 			/>
-			<div
-				ref={ blockTypesListRef }
-				className="edit-site-block-types-item-list"
-			>
-				{ filteredBlockTypes.map( ( block ) => (
-					<BlockMenuItem
-						block={ block }
-						key={ 'menu-itemblock-' + block.name }
-					/>
-				) ) }
-			</div>
+			<MemoizedBlockList filterValue={ deferredFilterValue } />
 		</>
 	);
 }

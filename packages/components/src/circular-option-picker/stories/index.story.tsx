@@ -5,15 +5,11 @@ import type { Meta, StoryFn } from '@storybook/react';
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	ButtonAction,
-	default as CircularOptionPicker,
-	DropdownLinkAction,
-} from '..';
+import CircularOptionPicker from '..';
 
 const CircularOptionPickerStoryContext = createContext< {
 	currentColor?: string;
@@ -21,19 +17,23 @@ const CircularOptionPickerStoryContext = createContext< {
 } >( {} );
 
 const meta: Meta< typeof CircularOptionPicker > = {
-	title: 'Components/CircularOptionPicker',
+	title: 'Components/Selection & Input/Color/CircularOptionPicker',
+	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		'CircularOptionPicker.Option': Option,
+		'CircularOptionPicker.Option': CircularOptionPicker.Option,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		'CircularOptionPicker.ButtonAction': ButtonAction,
+		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
-		'CircularOptionPicker.DropdownLinkAction': DropdownLinkAction,
+		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
+		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
+		'CircularOptionPicker.DropdownLinkAction':
+			CircularOptionPicker.DropdownLinkAction,
 	},
 	argTypes: {
-		actions: { control: { type: null } },
-		options: { control: { type: null } },
+		actions: { control: false },
+		options: { control: false },
 		children: { control: { type: 'text' } },
 	},
 	parameters: {
@@ -87,7 +87,6 @@ const DefaultOptions = () => {
 						onClick={ () => {
 							setCurrentColor?.( color );
 						} }
-						aria-label={ name }
 					/>
 				);
 			} ) }
@@ -102,7 +101,7 @@ const DefaultActions = () => {
 		<CircularOptionPicker.ButtonAction
 			onClick={ () => setCurrentColor?.( undefined ) }
 		>
-			{ 'Clear' }
+			Clear
 		</CircularOptionPicker.ButtonAction>
 	);
 };
@@ -112,7 +111,33 @@ const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
 );
 
 export const Default = Template.bind( {} );
-Default.args = { options: <DefaultOptions /> };
+Default.args = {
+	'aria-label': 'Circular Option Picker',
+	options: <DefaultOptions />,
+};
+
+export const AsButtons = Template.bind( {} );
+AsButtons.args = {
+	...Default.args,
+	asButtons: true,
+};
+
+export const WithLoopingDisabled = Template.bind( {} );
+WithLoopingDisabled.args = {
+	...Default.args,
+	loop: false,
+};
+WithLoopingDisabled.parameters = {
+	docs: {
+		source: {
+			code: `<CircularOptionPicker
+  'aria-label': 'Circular Option Picker',
+  loop={false}
+  options={<DefaultOptions />}
+/>`,
+		},
+	},
+};
 
 export const WithButtonAction = Template.bind( {} );
 WithButtonAction.args = {
@@ -127,7 +152,7 @@ WithDropdownLinkAction.args = {
 	actions: (
 		<CircularOptionPicker.DropdownLinkAction
 			dropdownProps={ {
-				popoverProps: { position: 'top right' },
+				popoverProps: { placement: 'top-end' },
 				renderContent: () => (
 					<div>This is an example of a DropdownLinkAction.</div>
 				),

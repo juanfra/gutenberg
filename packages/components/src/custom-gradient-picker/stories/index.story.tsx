@@ -13,7 +13,8 @@ import { useState } from '@wordpress/element';
 import CustomGradientPicker from '../';
 
 const meta: Meta< typeof CustomGradientPicker > = {
-	title: 'Components/CustomGradientPicker',
+	title: 'Components/Selection & Input/Color/CustomGradientPicker',
+	id: 'components-customgradientpicker',
 	component: CustomGradientPicker,
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -40,6 +41,3 @@ const CustomGradientPickerWithState: StoryFn<
 };
 
 export const Default = CustomGradientPickerWithState.bind( {} );
-Default.args = {
-	__nextHasNoMargin: true,
-};

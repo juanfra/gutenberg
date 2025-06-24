@@ -2,6 +2,7 @@
  * External dependencies
  */
 import type { ChangeEvent, ForwardedRef } from 'react';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,8 +14,9 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { TextControlProps } from './types';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function UnforwardedTextControl(
 	props: WordPressComponentProps< TextControlProps, 'input', false >,
@@ -22,6 +24,7 @@ function UnforwardedTextControl(
 ) {
 	const {
 		__nextHasNoMarginBottom,
+		__next40pxDefaultSize = false,
 		label,
 		hideLabelFromVision,
 		value,
@@ -36,9 +39,16 @@ function UnforwardedTextControl(
 	const onChangeValue = ( event: ChangeEvent< HTMLInputElement > ) =>
 		onChange( event.target.value );
 
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'TextControl',
+		size: undefined,
+		__next40pxDefaultSize,
+	} );
+
 	return (
 		<BaseControl
 			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+			__associatedWPComponentName="TextControl"
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -46,7 +56,9 @@ function UnforwardedTextControl(
 			className={ className }
 		>
 			<input
-				className="components-text-control__input"
+				className={ clsx( 'components-text-control__input', {
+					'is-next-40px-default-size': __next40pxDefaultSize,
+				} ) }
 				type={ type }
 				id={ id }
 				value={ value }
@@ -71,6 +83,8 @@ function UnforwardedTextControl(
  *
  *   return (
  *     <TextControl
+ *       __nextHasNoMarginBottom
+ *       __next40pxDefaultSize
  *       label="Additional CSS Class"
  *       value={ className }
  *       onChange={ ( value ) => setClassName( value ) }

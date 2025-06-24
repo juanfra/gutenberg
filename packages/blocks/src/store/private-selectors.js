@@ -1,7 +1,8 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createSelector from 'rememo';
+import { createSelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -52,23 +53,33 @@ function filterElementBlockSupports( blockSupports, name, element ) {
 			return false;
 		}
 
-		// This is only available for heading
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'textTransform' &&
 			! name &&
-			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
-				element
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
 			)
 		) {
 			return false;
 		}
 
-		// This is only available for headings
+		// This is only available for heading, button, caption and text
 		if (
 			support === 'letterSpacing' &&
 			! name &&
-			! [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
-				element
+			! (
+				[ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+					element
+				) ||
+				element === 'button' ||
+				element === 'caption' ||
+				element === 'text'
 			)
 		) {
 			return false;
@@ -106,15 +117,7 @@ export const getSupportedStyles = createSelector(
 
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
-		// Also, only allow `blockGap` support if serialization has not been skipped, to be sure global spacing can be applied.
-		if (
-			blockType?.supports?.spacing?.blockGap &&
-			blockType?.supports?.spacing?.__experimentalSkipSerialization !==
-				true &&
-			! blockType?.supports?.spacing?.__experimentalSkipSerialization?.some?.(
-				( spacingType ) => spacingType === 'blockGap'
-			)
-		) {
+		if ( blockType?.supports?.spacing?.blockGap ) {
 			supportKeys.push( 'blockGap' );
 		}
 
@@ -160,3 +163,83 @@ export const getSupportedStyles = createSelector(
 	},
 	( state, name ) => [ state.blockTypes[ name ] ]
 );
+
+/**
+ * Returns the bootstrapped block type metadata for a give block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block name.
+ *
+ * @return {Object} Bootstrapped block type metadata for a block.
+ */
+export function getBootstrappedBlockType( state, name ) {
+	return state.bootstrappedBlockTypes[ name ];
+}
+
+/**
+ * Returns all the unprocessed (before applying the `registerBlockType` filter)
+ * block type settings as passed during block registration.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Unprocessed block type settings for all blocks.
+ */
+export function getUnprocessedBlockTypes( state ) {
+	return state.unprocessedBlockTypes;
+}
+
+/**
+ * Returns all the block bindings sources registered.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object} All the registered sources and their properties.
+ */
+export function getAllBlockBindingsSources( state ) {
+	return state.blockBindingsSources;
+}
+
+/**
+ * Returns a specific block bindings source.
+ *
+ * @param {Object} state      Data state.
+ * @param {string} sourceName Name of the source to get.
+ *
+ * @return {Object} The specific block binding source and its properties.
+ */
+export function getBlockBindingsSource( state, sourceName ) {
+	return state.blockBindingsSources[ sourceName ];
+}
+
+/**
+ * Determines if any of the block type's attributes have
+ * the content role attribute.
+ *
+ * @param {Object} state         Data state.
+ * @param {string} blockTypeName Block type name.
+ * @return {boolean} Whether block type has content role attribute.
+ */
+export const hasContentRoleAttribute = ( state, blockTypeName ) => {
+	const blockType = getBlockType( state, blockTypeName );
+	if ( ! blockType ) {
+		return false;
+	}
+
+	return Object.values( blockType.attributes ).some(
+		( { role, __experimentalRole } ) => {
+			if ( role === 'content' ) {
+				return true;
+			}
+			if ( __experimentalRole === 'content' ) {
+				deprecated( '__experimentalRole attribute', {
+					since: '6.7',
+					version: '6.8',
+					alternative: 'role attribute',
+					hint: `Check the block.json of the ${ blockTypeName } block.`,
+				} );
+				return true;
+			}
+			return false;
+		}
+	);
+};

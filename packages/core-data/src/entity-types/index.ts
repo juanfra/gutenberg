@@ -3,16 +3,21 @@
  */
 import type { Context, Updatable } from './helpers';
 import type { Attachment } from './attachment';
+import type { Base, TemplatePartArea, TemplateType } from './base';
 import type { Comment } from './comment';
+import type { GlobalStylesRevision } from './global-styles-revision';
 import type { MenuLocation } from './menu-location';
 import type { NavMenu } from './nav-menu';
 import type { NavMenuItem } from './nav-menu-item';
 import type { Page } from './page';
 import type { Plugin } from './plugin';
 import type { Post } from './post';
+import type { PostStatusObject } from './post-status';
+import type { PostRevision } from './post-revision';
 import type { Settings } from './settings';
 import type { Sidebar } from './sidebar';
 import type { Taxonomy } from './taxonomy';
+import type { Term } from './term';
 import type { Theme } from './theme';
 import type { User } from './user';
 import type { Type } from './type';
@@ -25,21 +30,28 @@ export type { BaseEntityRecords } from './base-entity-records';
 
 export type {
 	Attachment,
+	Base as UnstableBase,
 	Comment,
 	Context,
+	GlobalStylesRevision,
 	MenuLocation,
 	NavMenu,
 	NavMenuItem,
 	Page,
 	Plugin,
 	Post,
+	PostRevision,
+	PostStatusObject,
 	Settings,
 	Sidebar,
 	Taxonomy,
+	TemplatePartArea,
+	TemplateType,
+	Term,
 	Theme,
+	Type,
 	Updatable,
 	User,
-	Type,
 	Widget,
 	WidgetType,
 	WpTemplate,
@@ -80,17 +92,22 @@ export type {
  */
 export interface PerPackageEntityRecords< C extends Context > {
 	core:
+		| Base< C >
 		| Attachment< C >
 		| Comment< C >
+		| GlobalStylesRevision< C >
 		| MenuLocation< C >
 		| NavMenu< C >
 		| NavMenuItem< C >
 		| Page< C >
 		| Plugin< C >
 		| Post< C >
+		| PostStatusObject< C >
+		| PostRevision< C >
 		| Settings< C >
 		| Sidebar< C >
 		| Taxonomy< C >
+		| Term< C >
 		| Theme< C >
 		| User< C >
 		| Type< C >

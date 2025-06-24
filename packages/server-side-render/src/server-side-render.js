@@ -7,7 +7,14 @@ import fastDeepEqual from 'fast-deep-equal/es6';
  * WordPress dependencies
  */
 import { useDebounce, usePrevious } from '@wordpress/compose';
-import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	RawHTML,
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -62,7 +69,22 @@ function DefaultErrorResponsePlaceholder( { response, className } ) {
 	return <Placeholder className={ className }>{ errorMessage }</Placeholder>;
 }
 
-function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
+function DefaultLoadingResponsePlaceholder( { children, isLoading } ) {
+	const [ showLoader, setShowLoader ] = useState( false );
+
+	useEffect( () => {
+		if ( ! isLoading ) {
+			setShowLoader( false );
+			return;
+		}
+
+		// Schedule showing the Spinner after 1 second.
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 1000 );
+		return () => clearTimeout( timeout );
+	}, [ isLoading ] );
+
 	return (
 		<div style={ { position: 'relative' } }>
 			{ showLoader && (
@@ -87,28 +109,35 @@ function DefaultLoadingResponsePlaceholder( { children, showLoader } ) {
 
 export default function ServerSideRender( props ) {
 	const {
-		attributes,
-		block,
 		className,
-		httpMethod = 'GET',
-		urlQueryArgs,
-		skipBlockSupportAttributes = false,
 		EmptyResponsePlaceholder = DefaultEmptyResponsePlaceholder,
 		ErrorResponsePlaceholder = DefaultErrorResponsePlaceholder,
 		LoadingResponsePlaceholder = DefaultLoadingResponsePlaceholder,
 	} = props;
 
-	const isMountedRef = useRef( true );
-	const [ showLoader, setShowLoader ] = useState( false );
+	const isMountedRef = useRef( false );
 	const fetchRequestRef = useRef();
 	const [ response, setResponse ] = useState( null );
 	const prevProps = usePrevious( props );
 	const [ isLoading, setIsLoading ] = useState( false );
+	const latestPropsRef = useRef( props );
 
-	function fetchData() {
+	useLayoutEffect( () => {
+		latestPropsRef.current = props;
+	}, [ props ] );
+
+	const fetchData = useCallback( () => {
 		if ( ! isMountedRef.current ) {
 			return;
 		}
+
+		const {
+			attributes,
+			block,
+			skipBlockSupportAttributes = false,
+			httpMethod = 'GET',
+			urlQueryArgs,
+		} = latestPropsRef.current;
 
 		setIsLoading( true );
 
@@ -169,18 +198,18 @@ export default function ServerSideRender( props ) {
 			} ) );
 
 		return fetchRequest;
-	}
+	}, [] );
 
 	const debouncedFetchData = useDebounce( fetchData, 500 );
 
 	// When the component unmounts, set isMountedRef to false. This will
 	// let the async fetch callbacks know when to stop.
-	useEffect(
-		() => () => {
+	useEffect( () => {
+		isMountedRef.current = true;
+		return () => {
 			isMountedRef.current = false;
-		},
-		[]
-	);
+		};
+	}, [] );
 
 	useEffect( () => {
 		// Don't debounce the first fetch. This ensures that the first render
@@ -192,29 +221,14 @@ export default function ServerSideRender( props ) {
 		}
 	} );
 
-	/**
-	 * Effect to handle showing the loading placeholder.
-	 * Show it only if there is no previous response or
-	 * the request takes more than one second.
-	 */
-	useEffect( () => {
-		if ( ! isLoading ) {
-			return;
-		}
-		const timeout = setTimeout( () => {
-			setShowLoader( true );
-		}, 1000 );
-		return () => clearTimeout( timeout );
-	}, [ isLoading ] );
-
 	const hasResponse = !! response;
 	const hasEmptyResponse = response === '';
-	const hasError = response?.error;
+	const hasError = !! response?.error;
 
 	if ( isLoading ) {
 		return (
-			<LoadingResponsePlaceholder { ...props } showLoader={ showLoader }>
-				{ hasResponse && (
+			<LoadingResponsePlaceholder { ...props } isLoading={ isLoading }>
+				{ hasResponse && ! hasError && (
 					<RawHTML className={ className }>{ response }</RawHTML>
 				) }
 			</LoadingResponsePlaceholder>

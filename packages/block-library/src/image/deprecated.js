@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -207,7 +207,7 @@ const v3 = {
 		const { url, alt, caption, align, href, width, height, id } =
 			attributes;
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			'is-resized': width || height,
 		} );
@@ -329,7 +329,7 @@ const v4 = {
 
 		const newRel = ! rel ? undefined : rel;
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -499,7 +499,7 @@ const v5 = {
 
 		const newRel = ! rel ? undefined : rel;
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -559,7 +559,7 @@ const v6 = {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'src',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		alt: {
 			type: 'string',
@@ -567,27 +567,27 @@ const v6 = {
 			selector: 'img',
 			attribute: 'alt',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		caption: {
 			type: 'string',
 			source: 'html',
 			selector: 'figcaption',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		title: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'title',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		href: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'figure > a',
 			attribute: 'href',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		rel: {
 			type: 'string',
@@ -603,7 +603,7 @@ const v6 = {
 		},
 		id: {
 			type: 'number',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		width: {
 			type: 'number',
@@ -632,9 +632,6 @@ const v6 = {
 	},
 	supports: {
 		anchor: true,
-		behaviors: {
-			lightbox: true,
-		},
 		color: {
 			text: false,
 			background: false,
@@ -653,6 +650,14 @@ const v6 = {
 				width: true,
 			},
 		},
+	},
+	migrate( attributes ) {
+		const { height, width } = attributes;
+		return {
+			...attributes,
+			width: typeof width === 'number' ? `${ width }px` : width,
+			height: typeof height === 'number' ? `${ height }px` : height,
+		};
 	},
 	save( { attributes } ) {
 		const {
@@ -676,7 +681,7 @@ const v6 = {
 		const newRel = ! rel ? undefined : rel;
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -686,7 +691,7 @@ const v6 = {
 					Object.keys( borderProps.style ).length > 0 ),
 		} );
 
-		const imageClasses = classnames( borderProps.className, {
+		const imageClasses = clsx( borderProps.className, {
 			[ `wp-image-${ id }` ]: !! id,
 		} );
 
@@ -757,7 +762,7 @@ const v7 = {
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'src',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		alt: {
 			type: 'string',
@@ -765,27 +770,27 @@ const v7 = {
 			selector: 'img',
 			attribute: 'alt',
 			default: '',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		caption: {
 			type: 'string',
 			source: 'html',
 			selector: 'figcaption',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		title: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'img',
 			attribute: 'title',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		href: {
 			type: 'string',
 			source: 'attribute',
 			selector: 'figure > a',
 			attribute: 'href',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		rel: {
 			type: 'string',
@@ -801,7 +806,7 @@ const v7 = {
 		},
 		id: {
 			type: 'number',
-			__experimentalRole: 'content',
+			role: 'content',
 		},
 		width: {
 			type: 'number',
@@ -830,9 +835,6 @@ const v7 = {
 	},
 	supports: {
 		anchor: true,
-		behaviors: {
-			lightbox: true,
-		},
 		color: {
 			text: false,
 			background: false,
@@ -881,7 +883,7 @@ const v7 = {
 		const newRel = ! rel ? undefined : rel;
 		const borderProps = getBorderClassesAndStyles( attributes );
 
-		const classes = classnames( {
+		const classes = clsx( {
 			[ `align${ align }` ]: align,
 			[ `size-${ sizeSlug }` ]: sizeSlug,
 			'is-resized': width || height,
@@ -891,7 +893,7 @@ const v7 = {
 					Object.keys( borderProps.style ).length > 0 ),
 		} );
 
-		const imageClasses = classnames( borderProps.className, {
+		const imageClasses = clsx( borderProps.className, {
 			[ `wp-image-${ id }` ]: !! id,
 		} );
 
@@ -947,4 +949,221 @@ const v7 = {
 	},
 };
 
-export default [ v7, v6, v5, v4, v3, v2, v1 ];
+const v8 = {
+	attributes: {
+		align: {
+			type: 'string',
+		},
+		behaviors: {
+			type: 'object',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			role: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			role: 'content',
+		},
+		caption: {
+			type: 'string',
+			source: 'html',
+			selector: 'figcaption',
+			role: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			role: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			role: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			role: 'content',
+		},
+		width: {
+			type: 'string',
+		},
+		height: {
+			type: 'string',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		anchor: true,
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+	},
+	migrate( { width, height, ...attributes } ) {
+		// We need to perform a check here because in cases
+		// where attributes are added dynamically to blocks,
+		// block invalidation overrides the isEligible() method
+		// and forces the migration to run, so it's not guaranteed
+		// that `behaviors` or `behaviors.lightbox` will be defined.
+		if ( ! attributes.behaviors?.lightbox ) {
+			return attributes;
+		}
+		const {
+			behaviors: {
+				lightbox: { enabled },
+			},
+		} = attributes;
+		const newAttributes = {
+			...attributes,
+			lightbox: {
+				enabled,
+			},
+		};
+		delete newAttributes.behaviors;
+		return newAttributes;
+	},
+	isEligible( attributes ) {
+		return !! attributes.behaviors;
+	},
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+
+		const classes = clsx( {
+			[ `align${ align }` ]: align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = clsx( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ {
+					...borderProps.style,
+					aspectRatio,
+					objectFit: scale,
+					width,
+					height,
+				} }
+				title={ title }
+			/>
+		);
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v8, v7, v6, v5, v4, v3, v2, v1 ];

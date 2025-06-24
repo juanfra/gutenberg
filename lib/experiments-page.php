@@ -44,86 +44,158 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-sync-collaboration',
-		__( 'Live Collaboration and offline persistence ', 'gutenberg' ),
+		'gutenberg-block-experiments',
+		__( 'Blocks: add experimental blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable the live collaboration and offline persistence between peers', 'gutenberg' ),
-			'id'    => 'gutenberg-sync-collaboration',
+			'label' => __( 'Enables experimental blocks on a rolling basis as they are developed.<p class="description">(Warning: these blocks may have significant changes during development that cause validation errors and display issues.)</p>', 'gutenberg' ),
+			'id'    => 'gutenberg-block-experiments',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-zoomed-out-view',
-		__( 'Zoomed out view ', 'gutenberg' ),
+		'gutenberg-form-blocks',
+		__( 'Blocks: add Form and input blocks', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test a new zoomed out view on the site editor (Warning: The new feature is not ready. You may experience UX issues that are being addressed)', 'gutenberg' ),
-			'id'    => 'gutenberg-zoomed-out-view',
+			'label' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),
+			'id'    => 'gutenberg-form-blocks',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-color-randomizer',
-		__( 'Color randomizer ', 'gutenberg' ),
+		'gutenberg-grid-interactivity',
+		__( 'Blocks: add Grid interactivity', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test the Global Styles color randomizer; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
-			'id'    => 'gutenberg-color-randomizer',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-group-grid-variation',
-		__( 'Grid variation for Group block ', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Test the Grid layout type as a new variation of Group block.', 'gutenberg' ),
-			'id'    => 'gutenberg-group-grid-variation',
+			'label' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
+			'id'    => 'gutenberg-grid-interactivity',
 		)
 	);
 
 	add_settings_field(
 		'gutenberg-no-tinymce',
-		__( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+		__( 'Blocks: disable TinyMCE and Classic block', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
+			'label' => __( 'Disables the TinyMCE and Classic block.', 'gutenberg' ),
 			'id'    => 'gutenberg-no-tinymce',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-auto-inserting-blocks',
-		__( 'Auto-inserting blocks', 'gutenberg' ),
+		'gutenberg-media-processing',
+		__( 'Client-side media processing', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Auto-inserting blocks', 'gutenberg' ),
-			'id'    => 'gutenberg-auto-inserting-blocks',
+			'label' => __( 'Enables client-side media processing to leverage the browser\'s capabilities to handle tasks like image resizing and compression.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-processing',
 		)
 	);
 
 	add_settings_field(
-		'gutenberg-custom-fields',
-		__( 'Connections', 'gutenberg' ),
+		'gutenberg-block-comment',
+		__( 'Collaboration: add block level comments', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Test Connections', 'gutenberg' ),
-			'id'    => 'gutenberg-connections',
+			'label' => __( 'Enables multi-user block level commenting.', 'gutenberg' ),
+			'id'    => 'gutenberg-block-comment',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-sync-collaboration',
+		__( 'Collaboration: add real time editing', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
+			'id'    => 'gutenberg-sync-collaboration',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-color-randomizer',
+		__( 'Color randomizer', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
+			'id'    => 'gutenberg-color-randomizer',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-custom-dataviews',
+		__( 'Data Views: add Custom Views', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the ability to add, edit, and save custom views when in the Site Editor.', 'gutenberg' ),
+			'id'    => 'gutenberg-custom-dataviews',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-new-posts-dashboard',
+		__( 'Data Views: enable for Posts', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
+			'id'    => 'gutenberg-new-posts-dashboard',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-quick-edit-dataviews',
+		__( 'Data Views: add Quick Edit', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
+			'id'    => 'gutenberg-quick-edit-dataviews',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-editor-write-mode',
+		__( 'Simplified site editing', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables Write mode in the Site Editor for a simplified editing experience.', 'gutenberg' ),
+			'id'    => 'gutenberg-editor-write-mode',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-full-page-client-side-navigation',
+		__( 'Interactivity API: Full-page client-side navigation', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables full-page client-side navigation, powered by the Interactivity API.', 'gutenberg' ),
+			'id'    => 'gutenberg-full-page-client-side-navigation',
 		)
 	);
 
@@ -160,7 +232,7 @@ function gutenberg_display_experiment_field( $args ) {
  */
 function gutenberg_display_experiment_section() {
 	?>
-	<p><?php echo __( "The block editor includes experimental features that are useable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
+	<p><?php echo __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ); ?></p>
 
 	<?php
 }

@@ -8,6 +8,8 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItemsChoice,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -19,6 +21,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function VariationsButtons( {
 	className,
@@ -33,6 +36,8 @@ function VariationsButtons( {
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
 				<Button
+					__next40pxDefaultSize
+					size="compact"
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
@@ -40,7 +45,7 @@ function VariationsButtons( {
 						selectedValue === variation.name
 							? variation.title
 							: sprintf(
-									/* translators: %s: Name of the block variation */
+									/* translators: %s: Block or block variation name. */
 									__( 'Transform to %s' ),
 									variation.title
 							  )
@@ -81,35 +86,81 @@ function VariationsDropdown( {
 			toggleProps={ { iconPosition: 'right' } }
 		>
 			{ () => (
-				<div className={ `${ className }__container` }>
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ selectOptions }
-							value={ selectedValue }
-							onSelect={ onSelectVariation }
-						/>
-					</MenuGroup>
-				</div>
+				<MenuGroup>
+					<MenuItemsChoice
+						choices={ selectOptions }
+						value={ selectedValue }
+						onSelect={ onSelectVariation }
+					/>
+				</MenuGroup>
 			) }
 		</DropdownMenu>
 	);
 }
 
+function VariationsToggleGroupControl( {
+	className,
+	onSelectVariation,
+	selectedValue,
+	variations,
+} ) {
+	return (
+		<div className={ className }>
+			<ToggleGroupControl
+				label={ __( 'Transform to variation' ) }
+				value={ selectedValue }
+				hideLabelFromVision
+				onChange={ onSelectVariation }
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+			>
+				{ variations.map( ( variation ) => (
+					<ToggleGroupControlOptionIcon
+						key={ variation.name }
+						icon={
+							<BlockIcon icon={ variation.icon } showColors />
+						}
+						value={ variation.name }
+						label={
+							selectedValue === variation.name
+								? variation.title
+								: sprintf(
+										/* translators: %s: Block or block variation name. */
+										__( 'Transform to %s' ),
+										variation.title
+								  )
+						}
+					/>
+				) ) }
+			</ToggleGroupControl>
+		</div>
+	);
+}
+
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations } = useSelect(
+	const { activeBlockVariation, variations, isContentOnly } = useSelect(
 		( select ) => {
 			const { getActiveBlockVariation, getBlockVariations } =
 				select( blocksStore );
-			const { getBlockName, getBlockAttributes } =
+
+			const { getBlockName, getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
+
 			const name = blockClientId && getBlockName( blockClientId );
+
+			const { hasContentRoleAttribute } = unlock( select( blocksStore ) );
+			const isContentBlock = hasContentRoleAttribute( name );
+
 			return {
 				activeBlockVariation: getActiveBlockVariation(
 					name,
 					getBlockAttributes( blockClientId )
 				),
 				variations: name && getBlockVariations( name, 'transform' ),
+				isContentOnly:
+					getBlockEditingMode( blockClientId ) === 'contentOnly' &&
+					! isContentBlock,
 			};
 		},
 		[ blockClientId ]
@@ -138,12 +189,20 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
+	if ( ! variations?.length || isContentOnly ) {
+		return null;
+	}
+
 	const baseClass = 'block-editor-block-variation-transforms';
 
-	// Skip rendering if there are no variations
-	if ( ! variations?.length ) return null;
+	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
+	const showButtons = variations.length > 5;
 
-	const Component = hasUniqueIcons ? VariationsButtons : VariationsDropdown;
+	const ButtonComponent = showButtons
+		? VariationsButtons
+		: VariationsToggleGroupControl;
+
+	const Component = hasUniqueIcons ? ButtonComponent : VariationsDropdown;
 
 	return (
 		<Component

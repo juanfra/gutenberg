@@ -1,16 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import {
+	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 
 const useTemplatePartsGroupedByArea = ( items ) => {
 	const allItems = items || [];
 
 	const templatePartAreas = useSelect(
 		( select ) =>
-			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+			select( coreStore ).getCurrentTheme()
+				?.default_template_part_areas || [],
 		[]
 	);
 
@@ -32,8 +40,10 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 	);
 
 	const groupedByArea = allItems.reduce( ( accumulator, item ) => {
-		const key = accumulator[ item.area ] ? item.area : 'uncategorized';
-		accumulator[ key ].templateParts.push( item );
+		const key = accumulator[ item.area ]
+			? item.area
+			: TEMPLATE_PART_AREA_DEFAULT_CATEGORY;
+		accumulator[ key ]?.templateParts?.push( item );
 		return accumulator;
 	}, knownAreas );
 
@@ -43,7 +53,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 export default function useTemplatePartAreas() {
 	const { records: templateParts, isResolving: isLoading } = useEntityRecords(
 		'postType',
-		'wp_template_part',
+		TEMPLATE_PART_POST_TYPE,
 		{ per_page: -1 }
 	);
 

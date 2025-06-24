@@ -56,7 +56,7 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 expected=7
-actual=$( find src -maxdepth 1 -type f | wc -l )
+actual=$( find src -maxdepth 2 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`src\` directory, but found $actual."
     exit 1
@@ -69,8 +69,8 @@ status "Building block..."
 ../node_modules/.bin/wp-scripts build
 
 status "Verifying build..."
-expected=7
-actual=$( find build -maxdepth 1 -type f | wc -l )
+expected=9
+actual=$( find build -maxdepth 2 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`build\` directory, but found $actual."
     exit 1

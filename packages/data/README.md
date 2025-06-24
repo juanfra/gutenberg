@@ -42,13 +42,6 @@ const actions = {
 			discountPercent,
 		};
 	},
-
-	fetchFromAPI( path ) {
-		return {
-			type: 'FETCH_FROM_API',
-			path,
-		};
-	},
 };
 
 const store = createReduxStore( 'my-shop', {
@@ -84,17 +77,11 @@ const store = createReduxStore( 'my-shop', {
 		},
 	},
 
-	controls: {
-		FETCH_FROM_API( action ) {
-			return apiFetch( { path: action.path } );
-		},
-	},
-
 	resolvers: {
-		*getPrice( item ) {
+		getPrice: ( item ) => async ({ dispatch }) => { {
 			const path = '/wp/v2/prices/' + item;
-			const price = yield actions.fetchFromAPI( path );
-			return actions.setPrice( item, price );
+			const price = await apiFetch( { path } );
+			dispatch.setPrice( item, price );
 		},
 	},
 } );
@@ -133,13 +120,21 @@ A **resolver** is a side-effect for a selector. If your selector result may need
 
 The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector, excluding the state argument. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
 
-#### `controls`
+Resolvers, in combination with [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async), can be used to implement asynchronous data flows for your store.
 
-A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
+#### `controls` (deprecated)
 
-The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+To handle asynchronous data flows, it is recommended to use [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async) instead of `controls`.
 
-Refer to the [documentation of `@wordpress/redux-routine`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md) for more information.
+<details>
+  <summary>View <em>controls</em> explanation</summary>
+<br>
+A <em>control</em> defines the execution flow behavior associated with a specific action type. Before <a href="https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async">thunks</a>, controls were used to implement asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
+<br><br>
+The <em>controls</em> option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+<br><br>
+Refer to the <a href="https://github.com/WordPress/gutenberg/tree/HEAD/packages/redux-routine/README.md">documentation of <em>@wordpress/redux-routine</em></a> for more information.
+</details>
 
 #### `initialState`
 
@@ -262,7 +257,7 @@ The data module shares many of the same [core principles](https://redux.js.org/i
 
 The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md)).
 
-The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [controls](#controls). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
+The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [thunks](https://github.com/WordPress/gutenberg/blob/trunk/docs/how-to-guides/thunks.md#thunks-can-be-async). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
 
 Specific implementation differences from Redux and React Redux:
 
@@ -315,7 +310,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: The component to be rendered.
+-   `Component`: The component to be rendered.
 
 ### combineReducers
 
@@ -397,7 +392,7 @@ Creates a new store registry, given an optional object of initial store configur
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `Object?`: Parent registry.
+-   _parent_ `?Object`: Parent registry.
 
 _Returns_
 
@@ -423,11 +418,11 @@ When registering a control created with `createRegistryControl` with a store, th
 
 _Parameters_
 
--   _registryControl_ `Function`: Function receiving a registry object and returning a control.
+-   _registryControl_ `T & { isRegistryControl?: boolean; }`: Function receiving a registry object and returning a control.
 
 _Returns_
 
--   `Function`: Registry control that can be registered with a store.
+-   Registry control that can be registered with a store.
 
 ### createRegistrySelector
 
@@ -476,11 +471,19 @@ with a store.
 
 _Parameters_
 
--   _registrySelector_ `Function`: Function receiving a registry `select` function and returning a state selector.
+-   _registrySelector_ `( select:  ) => Selector`: Function receiving a registry `select` function and returning a state selector.
 
 _Returns_
 
--   `Function`: Registry selector that can be registered with a store.
+-   `RegistrySelector< Selector >`: Registry selector that can be registered with a store.
+
+### createSelector
+
+Creates a memoized selector that caches the computed values according to the array of "dependants" and the selector parameters, and recomputes the values only when any of them changes.
+
+_Related_
+
+-   The documentation for the `rememo` package from which the `createSelector` function is reexported.
 
 ### dispatch
 
@@ -569,7 +572,7 @@ _Returns_
 
 A custom react Context consumer exposing the provided `registry` to children components. Used along with the RegistryProvider.
 
-You can read more about the react context api here: <https://reactjs.org/docs/context.html#contextprovider>
+You can read more about the react context api here: <https://react.dev/learn/passing-data-deeply-with-context#step-3-provide-the-context>
 
 _Usage_
 
@@ -702,8 +705,8 @@ the server via the `useSelect` hook to use in combination with the dispatch
 action.
 
 ```jsx
+import { useCallback } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { store as myCustomStore } from 'my-custom-store';
 
 function Button( { onClick, children } ) {
@@ -779,7 +782,7 @@ _Returns_
 
 Custom react hook for retrieving props from registered selectors.
 
-In general, this custom React hook follows the [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
+In general, this custom React hook follows the [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
 
 _Usage_
 
@@ -842,16 +845,16 @@ _Returns_
 
 ### useSuspenseSelect
 
-A variant of the `useSelect` hook that has the same API, but will throw a suspense Promise if any of the called selectors is in an unresolved state.
+A variant of the `useSelect` hook that has the same API, but is a compatible Suspense-enabled data source.
 
 _Parameters_
 
--   _mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
+-   _mapSelect_ `T`: Function called on every state change. The returned value is exposed to the component using this hook. The function receives the `registry.suspendSelect` method as the first argument and the `registry` as the second one.
 -   _deps_ `Array`: A dependency array used to memoize the `mapSelect` so that the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
 
--   `Object`: Data object returned by the `mapSelect` function.
+-   `ReturnType<T>`: Data object returned by the `mapSelect` function.
 
 ### withDispatch
 
@@ -939,7 +942,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component with merged dispatcher props.
+-   `ComponentType`: Enhanced component with merged dispatcher props.
 
 ### withRegistry
 
@@ -947,11 +950,11 @@ Higher-order component which renders the original component with the current reg
 
 _Parameters_
 
--   _OriginalComponent_ `WPComponent`: Original component.
+-   _OriginalComponent_ `Component`: Original component.
 
 _Returns_
 
--   `WPComponent`: Enhanced component.
+-   `Component`: Enhanced component.
 
 ### withSelect
 
@@ -995,7 +998,7 @@ _Parameters_
 
 _Returns_
 
--   `WPComponent`: Enhanced component with merged state data props.
+-   `ComponentType`: Enhanced component with merged state data props.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 
@@ -1126,6 +1129,86 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether resolution is in progress.
+
+### Normalizing Selector Arguments
+
+In specific circumstances it may be necessary to normalize the arguments passed to a given _call_ of a selector/resolver pairing.
+
+Each resolver has [its resolution status cached in an internal state](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/reducer.ts#L39) where the [key is the arguments supplied to the selector](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/utils.ts#L48) at _call_ time.
+
+For example for a selector with a single argument, the related resolver would generate a cache key of: `[ 123 ]`.
+
+[This cache is used to determine the resolution status of a given resolver](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/metadata/selectors.js#L22-L29) which is used to [avoid unwanted additional invocations of resolvers](https://github.com/WordPress/gutenberg/blob/e244388d8669618b76c966cc33d48df9156c2db6/packages/data/src/redux-store/index.js#L469-L474) (which often undertake "expensive" operations such as network requests).
+
+As a result it's important that arguments remain _consistent_ when calling the selector. For example, by _default_ these two calls will not be cached using the same key, even though they are likely identical:
+
+```js
+// Arg as number
+getSomeDataById( 123 );
+
+// Arg as string
+getSomeDataById( '123' );
+```
+
+This is an opportunity to utilize the `__unstableNormalizeArgs` property to guarantee consistency by protecting callers from passing incorrect types.
+
+#### Example
+
+The _3rd_ argument of the following selector is intended to be a `Number`:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	return state.items[ name ][ type ][ id ] || null;
+};
+```
+
+However, it is possible that the `id` parameter will be passed as a `String`. In this case, the `__unstableNormalizeArgs` method (property) can be defined on the _selector_ to coerce the arguments to the desired type even if they are provided "incorrectly":
+
+```js
+// Define normalization method.
+getItemsSelector.__unstableNormalizeArgs = ( args ) {
+	// "id" argument at the 2nd index
+	if (args[2] && typeof args[2] === 'string' ) {
+		args[2] === Number(args[2]);
+	}
+
+	return args;
+}
+```
+
+With this in place the following code will behave consistently:
+
+```js
+const getItemsSelector = ( name, type, id ) => {
+	// here 'id' is now guaranteed to be a number.
+	return state.items[ name ][ type ][ id ] || null;
+};
+
+const getItemsResolver = ( name, type, id ) => {
+	// 'id' is also guaranteed to be a number in the resolver.
+	return {};
+};
+
+registry.registerStore( 'store', {
+	// ...
+	selectors: {
+		getItems: getItemsSelector,
+	},
+	resolvers: {
+		getItems: getItemsResolver,
+	},
+} );
+
+// Call with correct number type.
+registry.select( 'store' ).getItems( 'foo', 'bar', 54 );
+
+// Call with the wrong string type, **but** here we have avoided an
+// wanted resolver call because '54' is guaranteed to have been
+// coerced to a number by the `__unstableNormalizeArgs` method.
+registry.select( 'store' ).getItems( 'foo', 'bar', '54' );
+```
+
+Ensuring consistency of arguments for a given selector call is [an important optimization to help improve performance in the data layer](https://github.com/WordPress/gutenberg/pull/52120). However, this type of problem can be usually be avoided by ensuring selectors don't use variable types for their arguments.
 
 ## Going further
 

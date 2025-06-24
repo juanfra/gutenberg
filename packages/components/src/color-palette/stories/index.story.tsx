@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import type { CSSProperties } from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 
 /**
@@ -13,16 +12,15 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ColorPalette from '..';
-import Popover from '../../popover';
-import { Provider as SlotFillProvider } from '../../slot-fill';
 
 const meta: Meta< typeof ColorPalette > = {
-	title: 'Components/ColorPalette',
+	title: 'Components/Selection & Input/Color/ColorPalette',
+	id: 'components-colorpalette',
 	component: ColorPalette,
 	argTypes: {
-		as: { control: { type: null } },
-		onChange: { action: 'onChange', control: { type: null } },
-		value: { control: { type: null } },
+		as: { control: false },
+		onChange: { action: 'onChange', control: false },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -31,22 +29,22 @@ const meta: Meta< typeof ColorPalette > = {
 };
 export default meta;
 
-const Template: StoryFn< typeof ColorPalette > = ( { onChange, ...args } ) => {
-	const [ color, setColor ] = useState< string | undefined >();
+const Template: StoryFn< typeof ColorPalette > = ( {
+	onChange,
+	value,
+	...args
+} ) => {
+	const [ color, setColor ] = useState< string | undefined >( value );
 
 	return (
-		<SlotFillProvider>
-			<ColorPalette
-				{ ...args }
-				value={ color }
-				onChange={ ( newColor ) => {
-					setColor( newColor );
-					onChange?.( newColor );
-				} }
-			/>
-			{ /* @ts-expect-error The 'Slot' component hasn't been typed yet. */ }
-			<Popover.Slot />
-		</SlotFillProvider>
+		<ColorPalette
+			{ ...args }
+			value={ color }
+			onChange={ ( newColor ) => {
+				setColor( newColor );
+				onChange?.( newColor );
+			} }
+		/>
 	);
 };
 
@@ -57,6 +55,16 @@ Default.args = {
 		{ name: 'White', color: '#fff' },
 		{ name: 'Blue', color: '#00f' },
 	],
+};
+
+export const InitialValue = Template.bind( {} );
+InitialValue.args = {
+	colors: [
+		{ name: 'Red', color: '#f00' },
+		{ name: 'White', color: '#fff' },
+		{ name: 'Blue', color: '#00f' },
+	],
+	value: '#00f',
 };
 
 export const MultipleOrigins = Template.bind( {} );
@@ -84,13 +92,11 @@ MultipleOrigins.args = {
 export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 	return (
 		<div
-			style={
-				{
-					'--red': '#f00',
-					'--yellow': '#ff0',
-					'--blue': '#00f',
-				} as CSSProperties
-			}
+			style={ {
+				'--red': '#f00',
+				'--yellow': '#ff0',
+				'--blue': '#00f',
+			} }
 		>
 			<Template { ...args } />
 		</div>

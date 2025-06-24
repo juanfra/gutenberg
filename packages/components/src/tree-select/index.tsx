@@ -9,6 +9,17 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import { SelectControl } from '../select-control';
 import type { TreeSelectProps, Tree, Truthy } from './types';
+import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import { ContextSystemProvider } from '../context';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+
+const CONTEXT_VALUE = {
+	BaseControl: {
+		// Temporary during deprecation grace period: Overrides the underlying `__associatedWPComponentName`
+		// via the context system to override the value set by SelectControl.
+		_overrides: { __associatedWPComponentName: 'TreeSelect' },
+	},
+};
 
 function getSelectOptions(
 	tree: Tree[],
@@ -25,18 +36,19 @@ function getSelectOptions(
 }
 
 /**
- * TreeSelect component is used to generate select input fields.
+ * Generates a hierarchical select input.
  *
- * @example
  * ```jsx
+ * import { useState } from 'react';
  * import { TreeSelect } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
  *
  * const MyTreeSelect = () => {
  * 	const [ page, setPage ] = useState( 'p21' );
  *
  * 	return (
  * 		<TreeSelect
+ * 			__nextHasNoMarginBottom
+ * 			__next40pxDefaultSize
  * 			label="Parent page"
  * 			noOptionLabel="No parent page"
  * 			onChange={ ( newPage ) => setPage( newPage ) }
@@ -72,15 +84,16 @@ function getSelectOptions(
  * }
  * ```
  */
+export function TreeSelect( props: TreeSelectProps ) {
+	const {
+		label,
+		noOptionLabel,
+		onChange,
+		selectedId,
+		tree = [],
+		...restProps
+	} = useDeprecated36pxDefaultSizeProp( props );
 
-export function TreeSelect( {
-	label,
-	noOptionLabel,
-	onChange,
-	selectedId,
-	tree = [],
-	...props
-}: TreeSelectProps ) {
 	const options = useMemo( () => {
 		return [
 			noOptionLabel && { value: '', label: noOptionLabel },
@@ -88,12 +101,21 @@ export function TreeSelect( {
 		].filter( < T, >( option: T ): option is Truthy< T > => !! option );
 	}, [ noOptionLabel, tree ] );
 
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'TreeSelect',
+		size: restProps.size,
+		__next40pxDefaultSize: restProps.__next40pxDefaultSize,
+	} );
+
 	return (
-		<SelectControl
-			{ ...{ label, options, onChange } }
-			value={ selectedId }
-			{ ...props }
-		/>
+		<ContextSystemProvider value={ CONTEXT_VALUE }>
+			<SelectControl
+				__shouldNotWarnDeprecated36pxSize
+				{ ...{ label, options, onChange } }
+				value={ selectedId }
+				{ ...restProps }
+			/>
+		</ContextSystemProvider>
 	);
 }
 

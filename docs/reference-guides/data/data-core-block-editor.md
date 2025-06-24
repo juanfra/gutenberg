@@ -39,7 +39,7 @@ Determines if the given blocks are allowed to be inserted into the block list.
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _clientIds_ `string`: The block client IDs to be inserted.
+-   _clientIds_ `string[]`: The block client IDs to be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
@@ -81,11 +81,10 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
--   `boolean | undefined`: Whether the given block is allowed to be moved.
+-   `boolean`: Whether the given block is allowed to be moved.
 
 ### canMoveBlocks
 
@@ -95,7 +94,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be moved.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -109,7 +107,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: The block client Id.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -123,7 +120,6 @@ _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientIds_ `string`: The block client IDs to be removed.
--   _rootClientId_ `?string`: Optional root client ID of block list.
 
 _Returns_
 
@@ -194,7 +190,7 @@ _Parameters_
 
 _Returns_
 
--   `Object?`: Block attributes.
+-   `?Object`: Block attributes.
 
 ### getBlockCount
 
@@ -266,7 +262,7 @@ _Returns_
 
 ### getBlockInsertionPoint
 
-Returns the insertion point, the index at which the new inserted block would be placed. Defaults to the last index.
+Returns the location of the insertion cue. Defaults to the last index.
 
 _Parameters_
 
@@ -409,6 +405,19 @@ _Returns_
 
 -   `WPBlock[]`: Block objects.
 
+### getBlocksByName
+
+Returns all blocks that match a blockName. Results include nested blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _blockName_ `string[]`: Block name(s) for which clientIds are to be returned.
+
+_Returns_
+
+-   `Array`: Array of clientIds of blocks with name equal to blockName.
+
 ### getBlockSelectionEnd
 
 Returns the current block selection end. This value may be null, and it may represent either a singular block selection or multi-selection end. A selection is singular if its start and end match.
@@ -439,7 +448,7 @@ Determines the items that appear in the available block transforms list.
 
 Each item object contains what's necessary to display a menu item in the transform list and handle its selection.
 
-The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequenty and recency.
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequency and recency.
 
 Items are returned ordered descendingly by their 'frecency'.
 
@@ -473,11 +482,11 @@ Returns an array containing the clientIds of all descendants of the blocks given
 _Parameters_
 
 -   _state_ `Object`: Global application state.
--   _clientIds_ `Array`: Array of blocks to inspect.
+-   _rootIds_ `string|string[]`: Client ID(s) for which descendant blocks are to be returned.
 
 _Returns_
 
--   `Array`: ids of descendants.
+-   `Array`: Client IDs of descendants.
 
 ### getClientIdsWithDescendants
 
@@ -502,7 +511,7 @@ _Parameters_
 
 _Returns_
 
--   `?WPDirectInsertBlock`: The block type to be directly inserted.
+-   `WPDirectInsertBlock|undefined`: The block type to be directly inserted.
 
 _Type Definition_
 
@@ -512,7 +521,7 @@ _Properties_
 
 -   _name_ `string`: The type of block.
 -   _attributes_ `?Object`: Attributes to pass to the newly created block.
--   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjecent blocks when inserted.
+-   _attributesToCopy_ `?Array<string>`: Attributes to be copied from adjacent blocks when inserted.
 
 ### getDraggedBlockClientIds
 
@@ -553,13 +562,25 @@ _Returns_
 
 -   `number`: Number of blocks in the post, or number of blocks with name equal to blockName.
 
+### getHoveredBlockClientId
+
+Returns the currently hovered block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: Client Id of the hovered block.
+
 ### getInserterItems
 
 Determines the items that appear in the inserter. Includes both static items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
 
 Each item object contains what's necessary to display a button in the inserter and handle its selection.
 
-The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequenty and recency.
+The 'frecency' property is a heuristic (<https://en.wikipedia.org/wiki/Frecency>) that combines block usage frequency and recency.
 
 Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
@@ -693,7 +714,7 @@ Returns the list of patterns based on their declared `blockTypes` and a block's 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
--   _blockNames_ `string|string[]`: Block's name or array of block names to find matching pattens.
+-   _blockNames_ `string|string[]`: Block's name or array of block names to find matching patterns.
 -   _rootClientId_ `?string`: Optional target root client ID.
 
 _Returns_
@@ -716,6 +737,39 @@ _Returns_
 ### getSelectedBlock
 
 Returns the currently selected block, or null if there is no selected block.
+
+_Usage_
+
+```js
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+// Set initial active block client ID
+let activeBlockClientId = null;
+
+const getActiveBlockData = () => {
+	const activeBlock = select( blockEditorStore ).getSelectedBlock();
+
+	if ( activeBlock && activeBlock.clientId !== activeBlockClientId ) {
+		activeBlockClientId = activeBlock.clientId;
+
+		// Get active block name and attributes
+		const activeBlockName = activeBlock.name;
+		const activeBlockAttributes = activeBlock.attributes;
+
+		// Log active block name and attributes
+		console.log( activeBlockName, activeBlockAttributes );
+	}
+};
+
+// Subscribe to changes in the editor
+// wp.data.subscribe(() => {
+// getActiveBlockData()
+// })
+
+// Update active block data on click
+// onclick="getActiveBlockData()"
+```
 
 _Parameters_
 
@@ -836,15 +890,9 @@ _Returns_
 
 ### hasBlockMovingClientId
 
+> **Deprecated**
+
 Returns whether block moving mode is enabled.
-
-_Parameters_
-
--   _state_ `Object`: Editor state.
-
-_Returns_
-
--   `string`: Client Id of moving block.
 
 ### hasDraggedInnerBlock
 
@@ -967,7 +1015,7 @@ _Returns_
 
 ### isBlockInsertionPointVisible
 
-Returns true if we should show the block insertion point.
+Returns true if the block insertion point is visible.
 
 _Parameters_
 
@@ -1077,6 +1125,19 @@ _Returns_
 
 -   `boolean`: Whether block is first in multi-selection.
 
+### isGroupable
+
+Indicates if the provided blocks(by client ids) are groupable. We need to have at least one block, have a grouping block name set and be able to remove these blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientIds_ `string[]`: Block client ids. If not passed the selected blocks client ids will be used.
+
+_Returns_
+
+-   `boolean`: True if the blocks are groupable.
+
 ### isLastBlockChangePersistent
 
 Returns true if the most recent block change is be considered persistent, or false otherwise. A persistent change is one committed by BlockEditorProvider via its `onChange` callback, in addition to `onInput`.
@@ -1140,6 +1201,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether user is typing.
+
+### isUngroupable
+
+Indicates if a block is ungroupable. A block is ungroupable if it is a single grouping block with inner blocks. If a block has an `ungroup` transform, it is also ungroupable, without the requirement of being the default grouping block. Additionally a block can only be ungrouped if it has inner blocks and can be removed.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client Id of the block. If not passed the selected block's client id will be used.
+
+_Returns_
+
+-   `boolean`: True if the block is ungroupable.
 
 ### isValidTemplate
 
@@ -1222,9 +1296,21 @@ _Parameters_
 
 Action that hides the insertion point.
 
+### hoverBlock
+
+Returns an action object used in signalling that the block with the specified client ID has been hovered.
+
+_Parameters_
+
+-   _clientId_ `string`: Block client ID.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### insertAfterBlock
 
-Action that inserts an empty block after a given block.
+Action that inserts a default block after a given block.
 
 _Parameters_
 
@@ -1232,7 +1318,7 @@ _Parameters_
 
 ### insertBeforeBlock
 
-Action that inserts an empty block before a given block.
+Action that inserts a default block before a given block.
 
 _Parameters_
 
@@ -1400,7 +1486,7 @@ wp.data.dispatch( 'core/block-editor' ).registerInserterMediaCategory( {
 			per_page: 'page_size',
 			search: 'q',
 		};
-		const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+		const url = new URL( 'https://api.openverse.org/v1/images/' );
 		Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
 			const queryKey = mapFromInserterMediaRequest[ key ] || key;
 			url.searchParams.set( queryKey, value );
@@ -1602,11 +1688,13 @@ _Returns_
 
 ### setBlockMovingClientId
 
-Action that enables or disables the block moving mode.
+> **Deprecated**
 
-_Parameters_
+Set the block moving client ID.
 
--   _hasBlockMovingClientId_ `string|null`: Enable/Disable block moving mode.
+_Returns_
+
+-   `Object`: Action object.
 
 ### setBlockVisibility
 
@@ -1802,11 +1890,11 @@ _Returns_
 
 ### updateBlockListSettings
 
-Action that changes the nested settings of a given block.
+Action that changes the nested settings of the given block(s).
 
 _Parameters_
 
--   _clientId_ `string`: Client ID of the block whose nested setting are being received.
+-   _clientId_ `string | SettingsByClientId`: Client ID of the block whose nested setting are being received, or object of settings by client ID.
 -   _settings_ `Object`: Object with the new settings for the nested block.
 
 _Returns_

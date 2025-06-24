@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { memo, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
 	BlockContextProvider,
@@ -27,9 +27,9 @@ const TEMPLATE = [
 	[ 'core/post-excerpt' ],
 ];
 
-function PostTemplateInnerBlocks() {
+function PostTemplateInnerBlocks( { classList } ) {
 	const innerBlocksProps = useInnerBlocksProps(
-		{ className: 'wp-block-post' },
+		{ className: clsx( 'wp-block-post', classList ) },
 		{ template: TEMPLATE, __unstableDisableLayoutClassNames: true }
 	);
 	return <li { ...innerBlocksProps } />;
@@ -38,13 +38,14 @@ function PostTemplateInnerBlocks() {
 function PostTemplateBlockPreview( {
 	blocks,
 	blockContextId,
+	classList,
 	isHidden,
 	setActiveBlockContextId,
 } ) {
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: {
-			className: 'wp-block-post',
+			className: clsx( 'wp-block-post', classList ),
 		},
 	} );
 
@@ -89,6 +90,7 @@ export default function PostTemplateEdit( {
 			taxQuery,
 			parents,
 			pages,
+			format,
 			// We gather extra query args to pass to the REST API call.
 			// This way extenders of Query Loop can add their own query args,
 			// and have accurate previews in the editor.
@@ -96,7 +98,6 @@ export default function PostTemplateEdit( {
 			// REST API or be handled by custom REST filters like `rest_{$this->post_type}_query`.
 			...restQueryArgs
 		} = {},
-		queryContext = [ { page: 1 } ],
 		templateSlug,
 		previewPostType,
 	},
@@ -104,18 +105,11 @@ export default function PostTemplateEdit( {
 	__unstableLayoutClassNames,
 } ) {
 	const { type: layoutType, columnCount = 3 } = layout || {};
-
-	const [ { page } ] = queryContext;
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getTaxonomies } = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
-			const taxonomies = getTaxonomies( {
-				type: postType,
-				per_page: -1,
-				context: 'view',
-			} );
 			const templateCategory =
 				inherit &&
 				templateSlug?.startsWith( 'category-' ) &&
@@ -125,13 +119,27 @@ export default function PostTemplateEdit( {
 					_fields: [ 'id' ],
 					slug: templateSlug.replace( 'category-', '' ),
 				} );
+			const templateTag =
+				inherit &&
+				templateSlug?.startsWith( 'tag-' ) &&
+				getEntityRecords( 'taxonomy', 'post_tag', {
+					context: 'view',
+					per_page: 1,
+					_fields: [ 'id' ],
+					slug: templateSlug.replace( 'tag-', '' ),
+				} );
 			const query = {
-				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
+				offset: offset || 0,
 				order,
 				orderby: orderBy,
 			};
 			// There is no need to build the taxQuery if we inherit.
 			if ( taxQuery && ! inherit ) {
+				const taxonomies = getTaxonomies( {
+					type: postType,
+					per_page: -1,
+					context: 'view',
+				} );
 				// We have to build the tax query for the REST API and use as
 				// keys the taxonomies `rest_base` with the `term ids` as values.
 				const builtTaxQuery = Object.entries( taxQuery ).reduce(
@@ -165,25 +173,49 @@ export default function PostTemplateEdit( {
 			if ( parents?.length ) {
 				query.parent = parents;
 			}
-			// If sticky is not set, it will return all posts in the results.
-			// If sticky is set to `only`, it will limit the results to sticky posts only.
-			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
-			if ( sticky ) {
+			if ( format?.length ) {
+				query.format = format;
+			}
+
+			/*
+			 * Handle cases where sticky is set to `exclude` or `only`.
+			 * Which works as a `post__in/post__not_in` query for sticky posts.
+			 */
+			if ( [ 'exclude', 'only' ].includes( sticky ) ) {
 				query.sticky = sticky === 'only';
 			}
+
+			// Empty string represents the default behavior of including sticky posts.
+			if ( [ '', 'ignore' ].includes( sticky ) ) {
+				// Remove any leftover sticky query parameter.
+				delete query.sticky;
+				query.ignore_sticky = sticky === 'ignore';
+			}
+
 			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
+			let currentPostType = postType;
 			if ( inherit ) {
 				// Change the post-type if needed.
 				if ( templateSlug?.startsWith( 'archive-' ) ) {
 					query.postType = templateSlug.replace( 'archive-', '' );
-					postType = query.postType;
+					currentPostType = query.postType;
 				} else if ( templateCategory ) {
 					query.categories = templateCategory[ 0 ]?.id;
+				} else if ( templateTag ) {
+					query.tags = templateTag[ 0 ]?.id;
+				} else if (
+					templateSlug?.startsWith( 'taxonomy-post_format' )
+				) {
+					// Get the post format slug from the template slug by removing the prefix.
+					query.format = templateSlug.replace(
+						'taxonomy-post_format-post-format-',
+						''
+					);
 				}
 			}
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
-			const usedPostType = previewPostType || postType;
+			const usedPostType = previewPostType || currentPostType;
 			return {
 				posts: getEntityRecords( 'postType', usedPostType, {
 					...query,
@@ -194,7 +226,6 @@ export default function PostTemplateEdit( {
 		},
 		[
 			perPage,
-			page,
 			offset,
 			order,
 			orderBy,
@@ -208,6 +239,7 @@ export default function PostTemplateEdit( {
 			templateSlug,
 			taxQuery,
 			parents,
+			format,
 			restQueryArgs,
 			previewPostType,
 		]
@@ -217,12 +249,13 @@ export default function PostTemplateEdit( {
 			posts?.map( ( post ) => ( {
 				postType: post.type,
 				postId: post.id,
+				classList: post.class_list ?? '',
 			} ) ),
 		[ posts ]
 	);
 
 	const blockProps = useBlockProps( {
-		className: classnames( __unstableLayoutClassNames, {
+		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
 		} ),
@@ -248,13 +281,13 @@ export default function PostTemplateEdit( {
 	const displayLayoutControls = [
 		{
 			icon: list,
-			title: __( 'List view' ),
+			title: _x( 'List view', 'Post template block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
 			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
 			icon: grid,
-			title: __( 'Grid view' ),
+			title: _x( 'Grid view', 'Post template block display setting' ),
 			onClick: () =>
 				setDisplayLayout( {
 					type: 'grid',
@@ -284,11 +317,14 @@ export default function PostTemplateEdit( {
 							{ blockContext.postId ===
 							( activeBlockContextId ||
 								blockContexts[ 0 ]?.postId ) ? (
-								<PostTemplateInnerBlocks />
+								<PostTemplateInnerBlocks
+									classList={ blockContext.classList }
+								/>
 							) : null }
 							<MemoizedPostTemplateBlockPreview
 								blocks={ blocks }
 								blockContextId={ blockContext.postId }
+								classList={ blockContext.classList }
 								setActiveBlockContextId={
 									setActiveBlockContextId
 								}

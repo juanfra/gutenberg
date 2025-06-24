@@ -11,7 +11,6 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
-	__experimentalGetMatchingVariation as getMatchingVariation,
 } from '@wordpress/block-editor';
 import { Button, Placeholder } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -19,52 +18,42 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useScopedBlockVariations, useBlockNameForPatterns } from '../utils';
+import { useScopedBlockVariations } from '../utils';
+import { useBlockPatterns } from './pattern-selection';
 
 export default function QueryPlaceholder( {
 	attributes,
 	clientId,
 	name,
 	openPatternSelectionModal,
-	setAttributes,
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const blockProps = useBlockProps();
-	const blockNameForPatterns = useBlockNameForPatterns(
-		clientId,
-		attributes
-	);
-
-	const { blockType, allVariations, hasPatterns } = useSelect(
+	const { blockType, activeBlockVariation } = useSelect(
 		( select ) => {
-			const { getBlockVariations, getBlockType } = select( blocksStore );
-			const { getBlockRootClientId, getPatternsByBlockTypes } =
-				select( blockEditorStore );
-			const rootClientId = getBlockRootClientId( clientId );
+			const { getActiveBlockVariation, getBlockType } =
+				select( blocksStore );
 			return {
 				blockType: getBlockType( name ),
-				allVariations: getBlockVariations( name ),
-				hasPatterns: !! getPatternsByBlockTypes(
-					blockNameForPatterns,
-					rootClientId
-				).length,
+				activeBlockVariation: getActiveBlockVariation(
+					name,
+					attributes
+				),
 			};
 		},
-		[ name, blockNameForPatterns, clientId ]
+		[ name, attributes ]
 	);
-
-	const matchingVariation = getMatchingVariation( attributes, allVariations );
+	const hasPatterns = !! useBlockPatterns( clientId, attributes ).length;
 	const icon =
-		matchingVariation?.icon?.src ||
-		matchingVariation?.icon ||
+		activeBlockVariation?.icon?.src ||
+		activeBlockVariation?.icon ||
 		blockType?.icon?.src;
-	const label = matchingVariation?.title || blockType?.title;
+	const label = activeBlockVariation?.title || blockType?.title;
 	if ( isStartingBlank ) {
 		return (
 			<QueryVariationPicker
 				clientId={ clientId }
 				attributes={ attributes }
-				setAttributes={ setAttributes }
 				icon={ icon }
 				label={ label }
 			/>
@@ -81,6 +70,7 @@ export default function QueryPlaceholder( {
 			>
 				{ !! hasPatterns && (
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						onClick={ openPatternSelectionModal }
 					>
@@ -89,6 +79,7 @@ export default function QueryPlaceholder( {
 				) }
 
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ () => {
 						setIsStartingBlank( true );
@@ -101,13 +92,7 @@ export default function QueryPlaceholder( {
 	);
 }
 
-function QueryVariationPicker( {
-	clientId,
-	attributes,
-	setAttributes,
-	icon,
-	label,
-} ) {
+function QueryVariationPicker( { clientId, attributes, icon, label } ) {
 	const scopeVariations = useScopedBlockVariations( attributes );
 	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const blockProps = useBlockProps();
@@ -118,18 +103,6 @@ function QueryVariationPicker( {
 				label={ label }
 				variations={ scopeVariations }
 				onSelect={ ( variation ) => {
-					if ( variation.attributes ) {
-						setAttributes( {
-							...variation.attributes,
-							query: {
-								...variation.attributes.query,
-								postType:
-									attributes.query.postType ||
-									variation.attributes.query.postType,
-							},
-							namespace: attributes.namespace,
-						} );
-					}
 					if ( variation.innerBlocks ) {
 						replaceInnerBlocks(
 							clientId,

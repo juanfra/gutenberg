@@ -16,14 +16,15 @@ import { CSS_UNITS } from '../utils';
 
 const meta: Meta< typeof UnitControl > = {
 	component: UnitControl,
-	title: 'Components (Experimental)/UnitControl',
+	title: 'Components (Experimental)/Selection & Input/UnitControl',
+	id: 'components-experimental-unitcontrol',
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
-		__unstableStateReducer: { control: { type: null } },
-		onChange: { control: { type: null } },
-		onUnitChange: { control: { type: null } },
+		__unstableStateReducer: { control: false },
+		onChange: { control: false },
+		onUnitChange: { control: false },
 		prefix: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		actions: { argTypesRegex: '^on.*' },
@@ -58,6 +59,7 @@ export const Default: StoryFn< typeof UnitControl > = DefaultTemplate.bind(
 );
 Default.args = {
 	label: 'Label',
+	__next40pxDefaultSize: true,
 };
 
 /**
