@@ -47,7 +47,7 @@ test.describe( 'Autosave', () => {
 
 		const { content } = JSON.parse( autosave );
 		expect( content ).toBe( `<!-- wp:paragraph -->
-<p>before save after save</p>
+<p class="wp-block-paragraph">before save after save</p>
 <!-- /wp:paragraph -->` );
 	} );
 

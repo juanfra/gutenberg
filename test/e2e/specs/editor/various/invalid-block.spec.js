@@ -46,7 +46,10 @@ test.describe( 'Invalid blocks', () => {
 			page
 				.getByRole( 'dialog', { name: 'Resolve Block' } )
 				.locator( '.block-editor-block-compare__html' )
-		).toHaveText( [ '<p>invalid paragraph', '<p>invalid paragraph</p>' ] );
+		).toHaveText( [
+			'<p>invalid paragraph',
+			'<p class="wp-block-paragraph">invalid paragraph</p>',
+		] );
 	} );
 
 	test( 'should strip potentially malicious on* attributes', async ( {
