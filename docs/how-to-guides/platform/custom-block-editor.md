@@ -502,7 +502,7 @@ If you open DeveloperTools and inspect the LocalStorage you will see serialized 
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This is an experiment to discover how easy (or otherwise) it is to create a standalone instance of the Block Editor in the WordPress admin.</p>
+<p class="wp-block-paragraph">This is an experiment to discover how easy (or otherwise) it is to create a standalone instance of the Block Editor in the WordPress admin.</p>
 <!-- /wp:paragraph -->
 ```
 

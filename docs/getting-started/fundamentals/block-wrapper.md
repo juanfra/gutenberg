@@ -90,6 +90,7 @@ When you add `supports` for any feature, the proper classes get added to the obj
 
 ```html
 <p class="
+    wp-block-paragraph
     wp-block-block-development-examples-block-supports-6aa4dd
     has-accent-4-color
     has-contrast-background-color

@@ -274,10 +274,10 @@ test.describe( 'Site Editor Performance', () => {
 						title: 'A post',
 						content: `
 <!-- wp:heading -->
-<p>Hello</p>
+<p class="wp-block-paragraph">Hello</p>
 <!-- /wp:heading -->
 <!-- wp:paragraph -->
-<p>Post content</p>
+<p class="wp-block-paragraph">Post content</p>
 <!-- /wp:paragraph -->`,
 					} );
 
@@ -405,10 +405,10 @@ test.describe( 'Site Editor Performance', () => {
 						title: `Page (${ index })`,
 						content: `
 <!-- wp:heading -->
-<p>Hello</p>
+<p class="wp-block-paragraph">Hello</p>
 <!-- /wp:heading -->
 <!-- wp:paragraph -->
-<p>Post content</p>
+<p class="wp-block-paragraph">Post content</p>
 <!-- /wp:paragraph -->`,
 					} );
 

@@ -7,72 +7,72 @@ const EDITOR_ZOOM_OUT_CONTENT = `
 <!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->
 <main class="wp-block-group"><!-- wp:group {"style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"base-2","layout":{"type":"flex","orientation":"vertical","verticalAlignment":"space-between"}} -->
 <div class="wp-block-group has-base-2-background-color has-background" style="min-height:100vh;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0"><!-- wp:paragraph -->
-<p>First Section Start</p>
+<p class="wp-block-paragraph">First Section Start</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-<p>First Section Center</p>
+<p class="wp-block-paragraph">First Section Center</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First Section End</p>
+<p class="wp-block-paragraph">First Section End</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:group {"style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"base","layout":{"type":"flex","orientation":"vertical","verticalAlignment":"space-between"}} -->
 <div class="wp-block-group has-base-background-color has-background" style="min-height:100vh;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0"><!-- wp:paragraph -->
-<p>Second Section Start</p>
+<p class="wp-block-paragraph">Second Section Start</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-<p>Second Section Center</p>
+<p class="wp-block-paragraph">Second Section Center</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Second Section End</p>
+<p class="wp-block-paragraph">Second Section End</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:group {"style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"base-2","layout":{"type":"flex","orientation":"vertical","verticalAlignment":"space-between"}} -->
 <div class="wp-block-group has-base-2-background-color has-background" style="min-height:100vh;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0"><!-- wp:paragraph -->
-<p>Third Section Start</p>
+<p class="wp-block-paragraph">Third Section Start</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-<p>Third Section Center</p>
+<p class="wp-block-paragraph">Third Section Center</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Third Section End</p>
+<p class="wp-block-paragraph">Third Section End</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
 
 <!-- wp:group {"style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"base","layout":{"type":"flex","orientation":"vertical","verticalAlignment":"space-between"}} -->
 <div class="wp-block-group has-base-background-color has-background" style="min-height:100vh;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0"><!-- wp:paragraph -->
-<p>Fourth Section Start</p>
+<p class="wp-block-paragraph">Fourth Section Start</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-<p>Fourth Section Center</p>
+<p class="wp-block-paragraph">Fourth Section Center</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>Fourth Section End</p>
+<p class="wp-block-paragraph">Fourth Section End</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></main>
 <!-- /wp:group -->`;
 
 const EDITOR_ZOOM_OUT_CONTENT_NO_SECTION_ROOT = `<!-- wp:group {"style":{"spacing":{"padding":{"top":"0","bottom":"0","left":"0","right":"0"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"base-2","layout":{"type":"flex","orientation":"vertical","verticalAlignment":"space-between"}} -->
 <div class="wp-block-group has-base-2-background-color has-background" style="min-height:100vh;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0"><!-- wp:paragraph -->
-<p>First Section Start</p>
+<p class="wp-block-paragraph">First Section Start</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"style":{"layout":{"selfStretch":"fit","flexSize":null}}} -->
-<p>First Section Center</p>
+<p class="wp-block-paragraph">First Section Center</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>First Section End</p>
+<p class="wp-block-paragraph">First Section End</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->`;
 

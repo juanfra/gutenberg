@@ -150,13 +150,13 @@ function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
  * <!-- wp:columns {"columns":3} -->
  * <div class="wp-block-columns has-3-columns"><!-- wp:column -->
  * <div class="wp-block-column"><!-- wp:paragraph -->
- * <p>Left</p>
+ * <p class="wp-block-paragraph">Left</p>
  * <!-- /wp:paragraph --></div>
  * <!-- /wp:column -->
  *
  * <!-- wp:column -->
  * <div class="wp-block-column"><!-- wp:paragraph -->
- * <p><strong>Middle</strong></p>
+ * <p class="wp-block-paragraph"><strong>Middle</strong></p>
  * <!-- /wp:paragraph --></div>
  * <!-- /wp:column -->
  *

@@ -111,7 +111,7 @@ describe( 'Verse block', () => {
 		<!-- /wp:verse -->
 
 		<!-- wp:paragraph -->
-		<p></p>
+		<p class="wp-block-paragraph"></p>
 		<!-- /wp:paragraph -->"
 	` );
 	} );

@@ -134,13 +134,13 @@ test.describe( 'Patterns', () => {
 				title: 'Unsynced footer',
 				meta: { wp_pattern_sync_status: 'unsynced' },
 				status: 'publish',
-				content: `<!-- wp:paragraph -->\n<p>Unsynced footer</p>\n<!-- /wp:paragraph -->`,
+				content: `<!-- wp:paragraph -->\n<p class="wp-block-paragraph">Unsynced footer</p>\n<!-- /wp:paragraph -->`,
 				wp_pattern_category: [],
 			} ),
 			requestUtils.createBlock( {
 				title: 'Synced footer',
 				status: 'publish',
-				content: `<!-- wp:paragraph -->\n<p>Synced footer</p>\n<!-- /wp:paragraph -->`,
+				content: `<!-- wp:paragraph -->\n<p class="wp-block-paragraph">Synced footer</p>\n<!-- /wp:paragraph -->`,
 				wp_pattern_category: [],
 			} ),
 		] );

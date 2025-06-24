@@ -19,7 +19,7 @@ register_block_pattern(
 	'test-allowed-patterns/lone-paragraph',
 	array(
 		'title'   => 'Test: Single paragraph',
-		'content' => '<!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph -->',
+		'content' => '<!-- wp:paragraph --><p class="wp-block-paragraph">Hello!</p><!-- /wp:paragraph -->',
 	)
 );
 
@@ -27,6 +27,6 @@ register_block_pattern(
 	'test-allowed-patterns/paragraph-inside-group',
 	array(
 		'title'   => 'Test: Paragraph inside group',
-		'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph --></div><!-- /wp:group -->',
+		'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p class="wp-block-paragraph">Hello!</p><!-- /wp:paragraph --></div><!-- /wp:group -->',
 	)
 );

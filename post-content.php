@@ -8,7 +8,7 @@
 ?>
 <!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","dimRatio":50,"align":"wide"} -->
 <div class="wp-block-cover alignwide is-light"><img class="wp-block-cover__image-background" src="https://cldup.com/Fz-ASbo2s3.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","textColor":"white","fontSize":"large"} -->
-<p class="has-text-align-center has-white-color has-text-color has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
+<p class="wp-block-paragraph has-text-align-center has-white-color has-text-color has-large-font-size"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 
@@ -21,7 +21,7 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"right"} -->
-<p class="has-text-align-right"><?php _e( '... like this one, which is right aligned.', 'gutenberg' ); ?></p>
+<p class="wp-block-paragraph has-text-align-right"><?php _e( '... like this one, which is right aligned.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -96,7 +96,7 @@
 <!-- wp:quote -->
 <blockquote class="wp-block-quote">
 	<!-- wp:paragraph -->
-	<p><?php _e( 'The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.', 'gutenberg' ); ?></p>
+	<p class="wp-block-paragraph"><?php _e( 'The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.', 'gutenberg' ); ?></p>
 	<!-- /wp:paragraph -->
 	<cite><?php _e( 'Matt Mullenweg, 2017', 'gutenberg' ); ?></cite>
 </blockquote>
@@ -174,11 +174,11 @@ https://vimeo.com/22439234
 <!-- /wp:paragraph -->
 
 <!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p><cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></blockquote></figure>
+<figure class="wp-block-pullquote"><blockquote><p class="wp-block-paragraph"><?php _e( 'Code is Poetry', 'gutenberg' ); ?></p><cite><?php _e( 'The WordPress community', 'gutenberg' ); ?></cite></blockquote></figure>
 <!-- /wp:pullquote -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p class="has-text-align-center">
+<p class="wp-block-paragraph has-text-align-center">
 	<em>
 		<?php
 		printf(
@@ -200,9 +200,9 @@ https://vimeo.com/22439234
 <!-- /wp:separator -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p class="has-text-align-center"><?php _e( 'Thanks for testing Gutenberg!', 'gutenberg' ); ?></p>
+<p class="wp-block-paragraph has-text-align-center"><?php _e( 'Thanks for testing Gutenberg!', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph {"align":"center"} -->
-<p class="has-text-align-center">👋</p>
+<p class="wp-block-paragraph has-text-align-center">👋</p>
 <!-- /wp:paragraph -->

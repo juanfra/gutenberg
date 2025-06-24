@@ -194,7 +194,7 @@ test.describe( 'Block Grouping', () => {
 			const { id: ref } = await requestUtils.createBlock( {
 				title: 'Block',
 				status: 'publish',
-				content: `<!-- wp:paragraph -->\n<p>Hey!</p>\n<!-- /wp:paragraph -->`,
+				content: `<!-- wp:paragraph -->\n<p class="wp-block-paragraph">Hey!</p>\n<!-- /wp:paragraph -->`,
 				wp_pattern_category: [],
 			} );
 

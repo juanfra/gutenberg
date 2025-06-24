@@ -19,7 +19,7 @@ test.describe( 'Content-only lock', () => {
 		await page.getByPlaceholder( 'Start writing with text or HTML' )
 			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>Hello</p>
+<p class="wp-block-paragraph">Hello</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->` );
 
@@ -44,7 +44,7 @@ test.describe( 'Content-only lock', () => {
 			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
 <div class="wp-block-group"><!-- wp:paragraph -->
-<p>Hello</p>
+<p class="wp-block-paragraph">Hello</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->` );
@@ -88,11 +88,11 @@ test.describe( 'Content-only lock', () => {
 		await page.getByPlaceholder( 'Start writing with text or HTML' )
 			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
 			<div class="wp-block-group"><!-- wp:paragraph -->
-			<p>Locked block a</p>
+			<p class="wp-block-paragraph">Locked block a</p>
 			<!-- /wp:paragraph -->
 			
 			<!-- wp:paragraph -->
-			<p>Locked block b</p>
+			<p class="wp-block-paragraph">Locked block b</p>
 			<!-- /wp:paragraph --></div>
 			<!-- /wp:group -->
 			

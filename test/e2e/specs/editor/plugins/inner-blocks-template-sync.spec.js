@@ -34,10 +34,10 @@ test.describe( 'InnerBlocks Template Sync', () => {
 			name: 'Type text or HTML',
 		} ).fill( `<!-- wp:test/test-inner-blocks-no-locking -->
 <!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Content…</p>
+<p class="wp-block-paragraph has-large-font-size">Content…</p>
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
-<p>added paragraph</p>
+<p class="wp-block-paragraph">added paragraph</p>
 <!-- /wp:paragraph -->
 <!-- /wp:test/test-inner-blocks-no-locking -->` );
 
@@ -77,10 +77,10 @@ test.describe( 'InnerBlocks Template Sync', () => {
 			name: 'Type text or HTML',
 		} ).fill( `<!-- wp:test/test-inner-blocks-locking-all -->
 <!-- wp:paragraph {"fontSize":"large"} -->
-<p class="has-large-font-size">Content…</p>
+<p class="wp-block-paragraph has-large-font-size">Content…</p>
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
-<p>added paragraph</p>
+<p class="wp-block-paragraph">added paragraph</p>
 <!-- /wp:paragraph -->
 <!-- /wp:test/test-inner-blocks-locking-all -->` );
 

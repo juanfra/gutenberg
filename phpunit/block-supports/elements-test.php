@@ -162,8 +162,8 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 				'elements_styles' => array(
 					'link' => array( 'color' => $color_styles ),
 				),
-				'block_markup'    => '<p class="has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
-				'expected_markup' => '/^<p class="has-dark-gray-background-color has-background wp-elements-[a-f0-9]{32}">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
+				'block_markup'    => '<p class="wp-block-paragraph has-dark-gray-background-color has-background">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
+				'expected_markup' => '/^<p class="wp-block-paragraph has-dark-gray-background-color has-background wp-elements-[a-f0-9]{32}">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
 			'element styles apply class to wrapper when it has other attributes' => array(
 				'color_settings'  => array( 'link' => true ),

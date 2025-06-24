@@ -234,13 +234,13 @@ test.describe( 'Pattern Overrides', () => {
 		} ) => {
 			const content = `
 			<!-- wp:paragraph {"metadata":{"name":"Pattern Overrides","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-			<p>Pattern Overrides</p>
+			<p class="wp-block-paragraph">Pattern Overrides</p>
 			<!-- /wp:paragraph -->
 			<!-- wp:paragraph {"metadata":{"name":"Post Meta Binding","bindings":{"content":{"source":"core/post-meta","args":{"key":"Post Meta Binding"}}}}} -->
-			<p>Post Meta Binding</p>
+			<p class="wp-block-paragraph">Post Meta Binding</p>
 			<!-- /wp:paragraph -->
 			<!-- wp:paragraph {"metadata":{"name":"No Overrides or Binding"}} -->
-			<p>No Overrides or Binding</p>
+			<p class="wp-block-paragraph">No Overrides or Binding</p>
 			<!-- /wp:paragraph -->
 			`;
 
@@ -493,7 +493,7 @@ test.describe( 'Pattern Overrides', () => {
 			const innerPattern = await requestUtils.createBlock( {
 				title: 'Inner Pattern',
 				content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-	<p>Inner paragraph</p>
+	<p class="wp-block-paragraph">Inner paragraph</p>
 	<!-- /wp:paragraph -->`,
 				status: 'publish',
 			} );
@@ -596,7 +596,7 @@ test.describe( 'Pattern Overrides', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-<p>Editable</p>
+<p class="wp-block-paragraph">Editable</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 		} );
@@ -643,7 +643,7 @@ test.describe( 'Pattern Overrides', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
-<p>Editable</p>
+<p class="wp-block-paragraph">Editable</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 		} );
@@ -799,7 +799,7 @@ test.describe( 'Pattern Overrides', () => {
 <h2 class="wp-block-heading">Heading</h2>
 <!-- /wp:heading -->
 <!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-<p>Paragraph</p>
+<p class="wp-block-paragraph">Paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 		} );
@@ -888,7 +888,7 @@ test.describe( 'Pattern Overrides', () => {
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:paragraph {"metadata":{"name":"${ paragraphName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
-<p>Paragraph</p>
+<p class="wp-block-paragraph">Paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 		} );
@@ -1204,10 +1204,10 @@ test.describe( 'Pattern Overrides', () => {
 			<h2>default name</h2>
 			<!-- /wp:heading -->
 			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
-			<p>default content</p>
+			<p class="wp-block-paragraph">default content</p>
 			<!-- /wp:paragraph -->
 			<!-- wp:paragraph {"metadata":{"name":"${ sharedName }","bindings":{"content":{"source":"core/pattern-overrides"}}}} -->
-			<p>default content</p>
+			<p class="wp-block-paragraph">default content</p>
 			<!-- /wp:paragraph -->`,
 				status: 'publish',
 			} );
@@ -1298,7 +1298,7 @@ test.describe( 'Pattern Overrides', () => {
 		const pattern = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:paragraph -->
-<p>paragraph</p>
+<p class="wp-block-paragraph">paragraph</p>
 <!-- /wp:paragraph -->`,
 			status: 'publish',
 			meta: {

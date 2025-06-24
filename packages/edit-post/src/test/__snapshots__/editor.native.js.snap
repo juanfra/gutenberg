@@ -34,7 +34,7 @@ exports[`Editor appends media correctly for allowed types and skips unsupported 
 
 exports[`Editor on content update parses markdown into blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing<br />elit.</p>
+<p class="wp-block-paragraph">Lorem ipsum dolor sit amet, consectetur adipiscing<br />elit.</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:heading -->

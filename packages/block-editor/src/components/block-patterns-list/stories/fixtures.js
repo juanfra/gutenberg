@@ -384,7 +384,7 @@ export default [
 										},
 										innerBlocks: [],
 										originalContent:
-											'<p class="has-text-align-right has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-4px;line-height:0.8;text-transform:uppercase">Let<br>\'EM<br>Roll</p>',
+											'<p class="wp-block-paragraph has-text-align-right has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-4px;line-height:0.8;text-transform:uppercase">Let<br>\'EM<br>Roll</p>',
 										validationIssues: [],
 									},
 									{
@@ -410,7 +410,7 @@ export default [
 										},
 										innerBlocks: [],
 										originalContent:
-											'<p class="has-text-align-right has-white-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-4px;line-height:0.8;text-transform:uppercase">Big<br>John<br>Patton</p>',
+											'<p class="wp-block-paragraph has-text-align-right has-white-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-4px;line-height:0.8;text-transform:uppercase">Big<br>John<br>Patton</p>',
 										validationIssues: [],
 									},
 								],
@@ -500,7 +500,7 @@ export default [
 										},
 										innerBlocks: [],
 										originalContent:
-											'<p class="has-text-color" style="color:#000000;font-size:30px;line-height:1.1"><strong>Oceanic Inspiration</strong></p>',
+											'<p class="wp-block-paragraph has-text-color" style="color:#000000;font-size:30px;line-height:1.1"><strong>Oceanic Inspiration</strong></p>',
 										validationIssues: [],
 									},
 								],
@@ -592,7 +592,7 @@ export default [
 										},
 										innerBlocks: [],
 										originalContent:
-											'<p class="has-text-color has-extra-small-font-size" style="color:#000000">Winding veils round their heads, the women walked on deck. They were now moving steadily down the river, passing the dark shapes of ships at anchor, and London was a swarm of lights with a pale yellow canopy drooping above it. There were the lights of the great theatres, the lights of the long streets, lights that indicated huge squares of domestic comfort, lights that hung high in air.</p>',
+											'<p class="wp-block-paragraph has-text-color has-extra-small-font-size" style="color:#000000">Winding veils round their heads, the women walked on deck. They were now moving steadily down the river, passing the dark shapes of ships at anchor, and London was a swarm of lights with a pale yellow canopy drooping above it. There were the lights of the great theatres, the lights of the long streets, lights that indicated huge squares of domestic comfort, lights that hung high in air.</p>',
 										validationIssues: [],
 									},
 								],
@@ -625,7 +625,7 @@ export default [
 										},
 										innerBlocks: [],
 										originalContent:
-											'<p class="has-text-color has-extra-small-font-size" style="color:#000000">No darkness would ever settle upon those lamps, as no darkness had settled upon them for hundreds of years. It seemed dreadful that the town should blaze for ever in the same spot; dreadful at least to people going away to adventure upon the sea, and beholding it as a circumscribed mound, eternally burnt, eternally scarred. From the deck of the ship the great city appeared a crouched and cowardly figure, a sedentary miser.</p>',
+											'<p class="wp-block-paragraph has-text-color has-extra-small-font-size" style="color:#000000">No darkness would ever settle upon those lamps, as no darkness had settled upon them for hundreds of years. It seemed dreadful that the town should blaze for ever in the same spot; dreadful at least to people going away to adventure upon the sea, and beholding it as a circumscribed mound, eternally burnt, eternally scarred. From the deck of the ship the great city appeared a crouched and cowardly figure, a sedentary miser.</p>',
 										validationIssues: [],
 									},
 								],
@@ -737,7 +737,7 @@ export default [
 								},
 								innerBlocks: [],
 								originalContent:
-									'<p class="has-text-align-left has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-2px;line-height:0.9;text-transform:uppercase"><mark style="color:#a65a00" class="has-inline-color">✴︎</mark> Walk</p>',
+									'<p class="wp-block-paragraph has-text-align-left has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-2px;line-height:0.9;text-transform:uppercase"><mark style="color:#a65a00" class="has-inline-color">✴︎</mark> Walk</p>',
 								validationIssues: [],
 							},
 							{
@@ -763,7 +763,7 @@ export default [
 								},
 								innerBlocks: [],
 								originalContent:
-									'<p class="has-text-align-right has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-2px;line-height:0.9;text-transform:uppercase">In the</p>',
+									'<p class="wp-block-paragraph has-text-align-right has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-2px;line-height:0.9;text-transform:uppercase">In the</p>',
 								validationIssues: [],
 							},
 							{
@@ -789,7 +789,7 @@ export default [
 								},
 								innerBlocks: [],
 								originalContent:
-									'<p class="has-text-align-left has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-2px;line-height:0.9;text-transform:uppercase">Park</p>',
+									'<p class="wp-block-paragraph has-text-align-left has-black-color has-text-color" style="font-size:148px;font-style:normal;font-weight:700;letter-spacing:-2px;line-height:0.9;text-transform:uppercase">Park</p>',
 								validationIssues: [],
 							},
 							{
@@ -817,7 +817,7 @@ export default [
 								},
 								innerBlocks: [],
 								originalContent:
-									'<p class="has-text-align-center has-text-color" style="color:#a65a00;font-size:140px;font-style:italic;font-weight:200;letter-spacing:0px;line-height:0.9;text-transform:uppercase">—01.03</p>',
+									'<p class="wp-block-paragraph has-text-align-center has-text-color" style="color:#a65a00;font-size:140px;font-style:italic;font-weight:200;letter-spacing:0px;line-height:0.9;text-transform:uppercase">—01.03</p>',
 								validationIssues: [],
 							},
 						],

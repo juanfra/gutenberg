@@ -72,7 +72,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	public function test_render_block_core_media_text_featured_image() {
 		$this->setup_query();
 
-		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div>';
+		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p class="wp-block-paragraph"></p></div></div>';
 
 		// Assert that the rendered block contains the featured image.
 		$attributes = array(
@@ -97,7 +97,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	 */
 	public function test_render_block_core_media_text_featured_image_nested() {
 		$this->setup_query();
-		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div></div></div>';
+		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p class="wp-block-paragraph"></p></div></div></div></div>';
 
 		// Assert that the rendered block contains the featured image.
 		$attributes = array(
@@ -122,7 +122,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	public function test_render_block_core_media_text_featured_image_media_on_right() {
 		$this->setup_query();
 
-		$content = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div>';
+		$content = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><p class="wp-block-paragraph"></p></div><figure class="wp-block-media-text__media"></figure></div>';
 
 		// Assert that the rendered block contains the featured image when media is on the right.
 		$attributes = array(
@@ -150,7 +150,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	public function test_render_block_core_media_text_featured_image_media_on_right_nested() {
 		$this->setup_query();
 
-		$content = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div></div><figure class="wp-block-media-text__media"></figure></div>';
+		$content = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><div class="wp-block-media-text__content"><p class="wp-block-paragraph"></p></div><figure class="wp-block-media-text__media"></figure></div></div><figure class="wp-block-media-text__media"></figure></div>';
 
 		// Assert that the rendered block contains the featured image when media is on the right.
 		$attributes = array(

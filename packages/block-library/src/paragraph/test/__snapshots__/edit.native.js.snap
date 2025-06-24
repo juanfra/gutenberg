@@ -17,7 +17,7 @@ exports[`Paragraph block should be able to use a prefix to create a List block 1
 exports[`Paragraph block should be able to use a prefix to create a Quote block 1`] = `
 "<!-- wp:quote -->
 <blockquote class="wp-block-quote"><!-- wp:paragraph -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph --></blockquote>
 <!-- /wp:quote -->"
 `;
@@ -32,7 +32,7 @@ exports[`Paragraph block should be able to use a prefix to create a numbered Lis
 
 exports[`Paragraph block should prevent deleting the first Paragraph block when pressing backspace at the start 1`] = `
 "<!-- wp:paragraph -->
-<p>A quick brown fox jumps over the lazy dog.</p>
+<p class="wp-block-paragraph">A quick brown fox jumps over the lazy dog.</p>
 <!-- /wp:paragraph -->"
 `;
 

@@ -472,7 +472,7 @@ describe( 'Columns block', () => {
 			<div class="wp-block-group"><!-- wp:columns -->
 			<div class="wp-block-columns"><!-- wp:column {"width":"100%"} -->
 			<div class="wp-block-column" style="flex-basis:100%"><!-- wp:paragraph -->
-			<p></p>
+			<p class="wp-block-paragraph"></p>
 			<!-- /wp:paragraph --></div>
 			<!-- /wp:column --></div>
 			<!-- /wp:columns --></div>

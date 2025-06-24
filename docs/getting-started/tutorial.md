@@ -713,7 +713,7 @@ Compare this to a statically rendered block like the Paragraph block.
 
 ```html
 <!-- wp:paragraph -->
-<p>This is a test.</p>
+<p class="wp-block-paragraph">This is a test.</p>
 <!-- /wp:paragraph -->
 ```
 

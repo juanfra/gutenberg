@@ -125,7 +125,7 @@ test.describe( 'Post-type locking', () => {
 			// Modify template.
 			await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 				.fill( `<!-- wp:paragraph {"placeholder":"Add a description"} -->
-<p></p>
+<p class="wp-block-paragraph"></p>
 <!-- /wp:paragraph -->` );
 
 			// Go back to the visual editor.

@@ -16,7 +16,7 @@ add_action(
 			array(
 				'title'       => 'Plugin Template',
 				'description' => 'A template registered by a plugin.',
-				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
+				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p class="wp-block-paragraph">This is a plugin-registered template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 				'post_types'  => array( 'post' ),
 			)
 		);
@@ -33,7 +33,7 @@ add_action(
 			array(
 				'title'       => 'Custom Template (overridden by the theme)',
 				'description' => 'A custom template registered by a plugin and overridden by a theme.',
-				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered template and overridden by a theme.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
+				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p class="wp-block-paragraph">This is a plugin-registered template and overridden by a theme.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 				'post_types'  => array( 'post' ),
 			)
 		);
@@ -44,7 +44,7 @@ add_action(
 			array(
 				'title'       => 'Plugin Unregistered Template',
 				'description' => 'A plugin-registered template that is unregistered.',
-				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered template that is also unregistered.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
+				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p class="wp-block-paragraph">This is a plugin-registered template that is also unregistered.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
 		unregister_block_template( 'gutenberg//plugin-unregistered-template' );
@@ -55,7 +55,7 @@ add_action(
 			array(
 				'title'       => 'Plugin Page Template',
 				'description' => 'A plugin-registered page template.',
-				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered page template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
+				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p class="wp-block-paragraph">This is a plugin-registered page template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
 
@@ -65,7 +65,7 @@ add_action(
 			array(
 				'title'       => 'Plugin Author Template',
 				'description' => 'A plugin-registered author template.',
-				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p>This is a plugin-registered author template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
+				'content'     => '<!-- wp:template-part {"slug":"header","tagName":"header"} /--><!-- wp:group {"tagName":"main","layout":{"inherit":true}} --><main class="wp-block-group"><!-- wp:paragraph --><p class="wp-block-paragraph">This is a plugin-registered author template.</p><!-- /wp:paragraph --></main><!-- /wp:group -->',
 			)
 		);
 	}

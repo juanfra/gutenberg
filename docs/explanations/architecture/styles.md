@@ -27,7 +27,7 @@ Since the introduction of the block editor in WordPress 5.0, there were tools fo
 By default, blocks come with a given HTML markup. Think of the paragraph block, for example:
 
 ```html
-<p></p>
+<p class="wp-block-paragraph"></p>
 ```
 
 In its simplest form, any style rule that targets the `p` selector will apply styles to this block, whether it comes from a block, a theme, etc.
@@ -37,7 +37,7 @@ The user may change the state of this block by applying different styles: a text
 After some user modifications to the block, the initial markup may become something like this:
 
 ```html
-<p class="has-color has-green-color has-font-size has-small-font-size my-custom-class"
+<p class="wp-block-paragraph has-color has-green-color has-font-size has-small-font-size my-custom-class"
 	style="line-height: 1em"></p>
 ```
 

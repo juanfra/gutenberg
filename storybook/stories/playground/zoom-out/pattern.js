@@ -10,7 +10,7 @@ export const pattern = `<!-- wp:cover {"customOverlayColor":"#eb4c77","contentPo
 <!-- /wp:spacer -->
 
 <!-- wp:paragraph {"align":"left","textColor":"contrast"} -->
-<p class="has-text-align-left has-contrast-color has-text-color">Explore our network of trails that lead through a variety of woodland habitats and observe the diverse flora that call this area home. </p>
+<p class="wp-block-paragraph has-text-align-left has-contrast-color has-text-color">Explore our network of trails that lead through a variety of woodland habitats and observe the diverse flora that call this area home. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:spacer {"height":"60px"} -->

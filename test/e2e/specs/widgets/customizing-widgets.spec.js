@@ -124,7 +124,7 @@ test.describe( 'Widgets Customizer', () => {
 		);
 
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
+			`<!-- wp:paragraph -->\n<p class="wp-block-paragraph">First Paragraph</p>\n<!-- /wp:paragraph -->`,
 			'sidebar-1'
 		);
 
@@ -239,7 +239,7 @@ test.describe( 'Widgets Customizer', () => {
 		widgetsCustomizerPage,
 	} ) => {
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
+			`<!-- wp:paragraph -->\n<p class="wp-block-paragraph">First Paragraph</p>\n<!-- /wp:paragraph -->`,
 			'sidebar-1'
 		);
 		await requestUtils.addWidgetBlock(
@@ -298,7 +298,7 @@ test.describe( 'Widgets Customizer', () => {
 		widgetsCustomizerPage,
 	} ) => {
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
+			`<!-- wp:paragraph -->\n<p class="wp-block-paragraph">First Paragraph</p>\n<!-- /wp:paragraph -->`,
 			'sidebar-1'
 		);
 
@@ -441,7 +441,7 @@ test.describe( 'Widgets Customizer', () => {
 		widgetsCustomizerPage,
 	} ) => {
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
+			`<!-- wp:paragraph -->\n<p class="wp-block-paragraph">First Paragraph</p>\n<!-- /wp:paragraph -->`,
 			'sidebar-1'
 		);
 
@@ -474,7 +474,7 @@ test.describe( 'Widgets Customizer', () => {
 		widgetsCustomizerPage,
 	} ) => {
 		await requestUtils.addWidgetBlock(
-			`<!-- wp:paragraph -->\n<p>First Paragraph</p>\n<!-- /wp:paragraph -->`,
+			`<!-- wp:paragraph -->\n<p class="wp-block-paragraph">First Paragraph</p>\n<!-- /wp:paragraph -->`,
 			'sidebar-1'
 		);
 

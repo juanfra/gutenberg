@@ -30,7 +30,7 @@ Input post:
 	<!-- wp:column -->
 	<div class="wp-block-column">
 		<!-- wp:paragraph -->
-		<p>Left</p>
+		<p class="wp-block-paragraph">Left</p>
 		<!-- /wp:paragraph -->
 	</div>
 	<!-- /wp:column -->
@@ -38,7 +38,7 @@ Input post:
 	<!-- wp:column -->
 	<div class="wp-block-column">
 		<!-- wp:paragraph -->
-		<p><strong>Middle</strong></p>
+		<p class="wp-block-paragraph"><strong>Middle</strong></p>
 		<!-- /wp:paragraph -->
 	</div>
 	<!-- /wp:column -->

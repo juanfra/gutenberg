@@ -18,7 +18,7 @@ Blocks understand content as attributes and are serializable to HTML. To this po
 
 ```html
 <!-- wp:paragraph {"key": "value"} -->
-<p>Welcome to the world of blocks.</p>
+<p class="wp-block-paragraph">Welcome to the world of blocks.</p>
 <!-- /wp:paragraph -->
 ```
 

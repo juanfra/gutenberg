@@ -484,7 +484,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			),
 			'block with child layout'                      => array(
 				'args'            => array(
-					'block_content' => '<p>Some text.</p>',
+					'block_content' => '<p class="wp-block-paragraph">Some text.</p>',
 					'block'         => array(
 						'blockName'    => 'core/paragraph',
 						'attrs'        => array(
@@ -495,9 +495,9 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 							),
 						),
 						'innerBlocks'  => array(),
-						'innerHTML'    => '<p>Some text.</p>',
+						'innerHTML'    => '<p class="wp-block-paragraph">Some text.</p>',
 						'innerContent' => array(
-							'<p>Some text.</p>',
+							'<p class="wp-block-paragraph">Some text.</p>',
 						),
 					),
 				),

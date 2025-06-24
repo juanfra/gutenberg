@@ -67,7 +67,9 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 			.getByRole( 'textbox' );
 
 		// Make sure the paragraph content is rendered as expected.
-		await expect( paragraphHTML ).toHaveValue( '<p>Hello world!</p>' );
+		await expect( paragraphHTML ).toHaveValue(
+			'<p class="wp-block-paragraph">Hello world!</p>'
+		);
 
 		// Change the `drop cap` using the sidebar.
 		await page
@@ -80,7 +82,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 
 		// Make sure the HTML content updated.
 		await expect( paragraphHTML ).toHaveValue(
-			'<p class="has-drop-cap">Hello world!</p>'
+			'<p class="wp-block-paragraph has-drop-cap">Hello world!</p>'
 		);
 	} );
 
@@ -134,7 +136,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		// Change content.
 		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 			.fill( `<!-- wp:paragraph -->
-<p>Hi world!</p>
+<p class="wp-block-paragraph">Hi world!</p>
 <!-- /wp:paragraph -->` );
 
 		// Save the post using the shortcut.
@@ -167,7 +169,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		// Change the content.
 		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
 			.fill( `<!-- wp:paragraph -->
-<p>abc</p>
+<p class="wp-block-paragraph">abc</p>
 <!-- /wp:paragraph -->` );
 
 		// Go back to the visual editor.

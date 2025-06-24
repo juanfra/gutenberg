@@ -33,7 +33,7 @@ test.describe( 'Template hierarchy', () => {
 			title: 'Page on Front',
 			status: 'publish',
 			content:
-				'<!-- wp:paragraph --><p>This is a page on front</p><!-- /wp:paragraph -->',
+				'<!-- wp:paragraph --><p class="wp-block-paragraph">This is a page on front</p><!-- /wp:paragraph -->',
 		} );
 		await requestUtils.updateSiteSettings( {
 			show_on_front: 'page',

@@ -1091,22 +1091,22 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 				'expected_output'             => '<h2 class="has-vivid-red-background-color has-background has-link-color" style="margin-top:var(--wp--preset--spacing--60);font-size:clamp(2.2rem, 2.2rem + ((1vw - 0.2rem) * 2.25), 4rem);font-style:normal;font-weight:600;letter-spacing:29px;text-decoration:underline;text-transform:capitalize">This is a heading</h2>',
 			),
 			'return_content_if_no_inline_font_size_found'  => array(
-				'block_content'               => '<p class="has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
+				'block_content'               => '<p class="wp-block-paragraph has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
 				'font_size_value'             => '20px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="wp-block-paragraph has-medium-font-size" style="font-style:normal;font-weight:600;letter-spacing:29px;">A paragraph inside a group</p>',
 			),
 			'return_content_css_var'                       => array(
-				'block_content'               => '<p class="has-medium-font-size" style="font-size:var(--wp--preset--font-size--x-large);">A paragraph inside a group</p>',
+				'block_content'               => '<p class="wp-block-paragraph has-medium-font-size" style="font-size:var(--wp--preset--font-size--x-large);">A paragraph inside a group</p>',
 				'font_size_value'             => 'var:preset|font-size|x-large',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="font-size:var(--wp--preset--font-size--x-large);">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="wp-block-paragraph has-medium-font-size" style="font-size:var(--wp--preset--font-size--x-large);">A paragraph inside a group</p>',
 			),
 			'return_content_with_spaces'                   => array(
-				'block_content'               => '<p class="has-medium-font-size" style="    font-size:   20px   ;    ">A paragraph inside a group</p>',
+				'block_content'               => '<p class="wp-block-paragraph has-medium-font-size" style="    font-size:   20px   ;    ">A paragraph inside a group</p>',
 				'font_size_value'             => '20px',
 				'should_use_fluid_typography' => true,
-				'expected_output'             => '<p class="has-medium-font-size" style="    font-size:clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.469), 20px);    ">A paragraph inside a group</p>',
+				'expected_output'             => '<p class="wp-block-paragraph has-medium-font-size" style="    font-size:clamp(14px, 0.875rem + ((1vw - 3.2px) * 0.469), 20px);    ">A paragraph inside a group</p>',
 			),
 			'return_content_with_first_match_replace_only' => array(
 				'block_content'               => "<div class=\"wp-block-group\" style=\"font-size:1.5em\"> \n \n<p style=\"font-size:1.5em\">A paragraph inside a group</p></div>",

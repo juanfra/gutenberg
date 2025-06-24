@@ -38,6 +38,6 @@ exports[`Heading block should set a text color 1`] = `
 
 exports[`Heading block should transform to a paragraph block when pressing backspace at the beginning of the first heading block 1`] = `
 "<!-- wp:paragraph -->
-<p>A quick brown fox jumps over the lazy dog.</p>
+<p class="wp-block-paragraph">A quick brown fox jumps over the lazy dog.</p>
 <!-- /wp:paragraph -->"
 `;

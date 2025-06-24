@@ -32,7 +32,7 @@ To opt into this, include `core/post-content` in the Block Types for your patter
 <!-- /wp:heading -->
 
 <!-- wp:paragraph {"lock":{"move":true,"remove":true}} -->
-<p>To RSVP, please join the #fse-outreach-experiment in Make Slack. </p>
+<p class="wp-block-paragraph">To RSVP, please join the #fse-outreach-experiment in Make Slack. </p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons -->
@@ -43,7 +43,7 @@ To opt into this, include `core/post-content` in the Block Types for your patter
 
 <!-- wp:cover {"useFeaturedImage":true,"dimRatio":80,"overlayColor":"primary","contentPosition":"center center","align":"full"} -->
 <div class="wp-block-cover alignfull"><span aria-hidden="true" class="wp-block-cover__background has-primary-background-color has-background-dim-80 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write titleā¦","fontSize":"large"} -->
-<p class="has-text-align-center has-large-font-size">We hope to see you there!</p>
+<p class="wp-block-paragraph has-text-align-center has-large-font-size">We hope to see you there!</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->
 ```
@@ -62,7 +62,7 @@ register_block_pattern(
   array(
       'title'         => __( '404 Only template pattern', 'wp-my-theme' ),
       'templateTypes' => array( '404' ),
-      'content'       => '<!-- wp:paragraph {"align":"center","fontSize":"x-large"} --><p class="has-text-align-center has-x-large-font-size">404 pattern</p><!-- /wp:paragraph -->',
+      'content'       => '<!-- wp:paragraph {"align":"center","fontSize":"x-large"} --><p class="wp-block-paragraph has-text-align-center has-x-large-font-size">404 pattern</p><!-- /wp:paragraph -->',
   )
 );
 ```

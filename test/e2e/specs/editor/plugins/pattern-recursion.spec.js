@@ -17,7 +17,7 @@ test.describe( 'Preventing Pattern Recursion (client)', () => {
 						title: 'Evil recursive',
 						description: 'Evil recursive',
 						content:
-							'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph --><!-- wp:pattern {"slug":"evil/recursive"} /-->',
+							'<!-- wp:paragraph --><p class="wp-block-paragraph">Hello</p><!-- /wp:paragraph --><!-- wp:pattern {"slug":"evil/recursive"} /-->',
 					},
 				],
 			} );

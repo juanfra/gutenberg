@@ -152,7 +152,7 @@ register_block_pattern(
 		'title'      => __( 'Powered by WordPress', 'my-plugin' ),
 		'blockTypes' => array( 'core/paragraph' ),
 		'content'    => '<!-- wp:paragraph {"backgroundColor":"black","textColor":"white"} -->
-		<p class="has-white-color has-black-background-color has-text-color has-background">Powered by WordPress</p>
+		<p class="wp-block-paragraph has-white-color has-black-background-color has-text-color has-background">Powered by WordPress</p>
 		<!-- /wp:paragraph -->',
 	)
 );
@@ -174,7 +174,7 @@ register_block_pattern(
 						<h2 class="has-large-font-size"><span style="color:#ba0c49" class="has-inline-color">Hi everyone</span></h2>
 						<!-- /wp:heading -->
 						<!-- wp:paragraph {"backgroundColor":"black","textColor":"white"} -->
-						<p class="has-white-color has-black-background-color has-text-color has-background">Powered by WordPress</p>
+						<p class="wp-block-paragraph has-white-color has-black-background-color has-text-color has-background">Powered by WordPress</p>
 						<!-- /wp:paragraph -->
 						</div><!-- /wp:group -->',
 	)

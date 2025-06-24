@@ -35,7 +35,7 @@ While requesting `/wp/v2/posts/1?context=edit`, yields:
   "content": {
     "block_version": 1,
     "protected": false,
-    "raw": "<!-- wp:paragraph -->\n<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>\n<!-- /wp:paragraph -->",
+    "raw": "<!-- wp:paragraph -->\n<p class=\"wp-block-paragraph\">Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>\n<!-- /wp:paragraph -->",
     "rendered": "\n<p>Welcome to WordPress. This is your first post. Edit or delete it, then start writing!</p>\n"
   },
   "title": {
