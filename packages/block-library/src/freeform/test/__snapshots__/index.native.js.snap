@@ -2,6 +2,6 @@
 
 exports[`Classic block converts content into blocks 1`] = `
 "<!-- wp:paragraph -->
-<p>I'm classic!</p>
+<p class="wp-block-paragraph">I'm classic!</p>
 <!-- /wp:paragraph -->"
 `;

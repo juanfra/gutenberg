@@ -10,7 +10,7 @@ exports[`PostTitle does not update title with existing content when pasting HTML
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This is a paragraph.</p>
+<p class="wp-block-paragraph">This is a paragraph.</p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -20,6 +20,6 @@ exports[`PostTitle populates empty title with first block content when pasting H
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>This is a paragraph.</p>
+<p class="wp-block-paragraph">This is a paragraph.</p>
 <!-- /wp:paragraph -->"
 `;
