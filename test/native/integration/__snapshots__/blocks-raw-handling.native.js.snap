@@ -195,7 +195,7 @@ exports[`rawHandler should convert a list with attributes 1`] = `
 
 exports[`rawHandler should convert to unsupported HTML block when no transformation is available 1`] = `
 "<!-- wp:html -->
-<div><p class="wp-block-paragraph">Hello world!</p></div>
+<div><p>Hello world!</p></div>
 <!-- /wp:html -->"
 `;
 

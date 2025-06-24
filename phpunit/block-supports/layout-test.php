@@ -501,7 +501,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '<p class="wp-container-content-b7aa651c">Some text.</p>',
+				'expected_output' => '<p class="wp-block-paragraph wp-container-content-b7aa651c">Some text.</p>',
 			),
 			'single wrapper block layout with flex type'   => array(
 				'args'            => array(

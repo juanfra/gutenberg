@@ -4,23 +4,23 @@ exports[`formatTestErrorMessage should format test error message for @playwright
 "Error: Snapshot comparison failed:
 
   <!-- wp:paragraph -->
-  <p>block</p>
+  <p class="wp-block-paragraph">block</p>
   <!-- /wp:paragraph -->
 
   <!-- wp:paragraph -->
-  <p>B </p>
+  <p class="wp-block-paragraph">B </p>
   <!-- /wp:paragraph -->
 
   <!-- wp:paragraph -->
-  <p>A block</p>
+  <p class="wp-block-paragraph">A block</p>
   <!-- /wp:paragraph -->
 
   <!-- wp:paragraph -->
-  <p></p>
+  <p class="wp-block-paragraph"></p>
   <!-- /wp:paragraph -->
 
   <!-- wp:paragraph -->
-  <p>B block</p>
+  <p class="wp-block-paragraph">B block</p>
   <!-- /wp:paragraph -->
 
 Expected: /home/runner/work/gutenberg/gutenberg/artifacts/test-results/editor-various-copy-cut-paste-Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-chromium/Copy-cut-paste-should-copy-only-partial-selection-of-text-blocks-2-expected.txt
