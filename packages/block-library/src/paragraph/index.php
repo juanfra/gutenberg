@@ -14,6 +14,8 @@
  * Would be transformed to:
  *  <p class="align-left wp-block-paragraph">Hello World</p>
  *
+ * @since 6.9.0
+ *
  * @param array  $attributes Attributes of the block being rendered.
  * @param string $content Content of the block being rendered.
  *
@@ -38,6 +40,8 @@ function block_core_paragraph_render( $attributes, $content ) {
 
 /**
  * Registers the `core/paragraph` block on server.
+ *
+ * @since 6.9.0
  */
 function register_block_core_paragraph() {
 	register_block_type_from_metadata(
