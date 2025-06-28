@@ -26,16 +26,13 @@ function block_core_paragraph_render( $attributes, $content ) {
 		return $content;
 	}
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	$processor = new WP_HTML_Tag_Processor( $content );
 
-	while ( $p->next_tag() ) {
-		if ( 'P' === $p->get_tag() ) {
-			$p->add_class( 'wp-block-paragraph' );
-			break;
-		}
+	while ( $processor->next_tag( 'P' ) ) {
+		$processor->add_class( 'wp-block-paragraph' );
 	}
 
-	return $p->get_updated_html();
+	return $processor->get_updated_html();
 }
 
 /**
